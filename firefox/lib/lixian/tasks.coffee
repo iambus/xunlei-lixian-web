@@ -77,7 +77,7 @@ add_bt_tasks = (client, urls, callback) ->
 			callback ok: true, hashes: hashes
 			return
 		url = urls.shift()
-		if url.match /^maget:/
+		if url.match /^magnet:/
 			client.add_magnet_task url, (result) ->
 				if result.ok
 					hashes.push result.info_hash
