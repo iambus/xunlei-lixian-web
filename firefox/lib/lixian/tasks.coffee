@@ -103,7 +103,7 @@ super_add = (client, urls, callback) ->
 	urls = []
 	add_normal = (callback) ->
 		if normal_urls.length > 0
-			client.add_batch_tasks urls, (result) ->
+			client.add_batch_tasks normal_urls, (result) ->
 				if result.ok
 					urls = urls.concat normal_urls
 					callback ok: true
