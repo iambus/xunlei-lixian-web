@@ -1,4 +1,7 @@
 
+is_ed2k = (url) ->
+	url.match /^ed2k:\/\//
+
 normalize_unicode_url = (url) ->
 	throw new Error("Not Implemented: normalize_unicode_link")
 
@@ -28,7 +31,7 @@ url_unmask = (url) ->
 
 parse_ed2k_url_hash_hex = (url) ->
 	ed2k_re = /^ed2k:\/\/\|file\|([^|]*)\|(\d+)\|([a-fA-F0-9]{32})\|/
-	ed2k_re.match(url)?[1].toLowerCase()
+	url.match(ed2k_re)?[2].toLowerCase()
 
 magnet_to_infohash = (url) ->
 	throw new Error("Not Implemented")
@@ -50,8 +53,12 @@ normalize_url = (url) ->
 		return url
 
 url_equals = (u1, u2) ->
-	normalize_url(u1) == normalize_url(u2)
-
+	# TODO: implement all URLs!
+#	normalize_url(u1) == normalize_url(u2)
+	if is_ed2k(u1) and is_ed2k(u2)
+		return parse_ed2k_url_hash_hex(u1) == parse_ed2k_url_hash_hex(u2)
+	else
+		return u1 == u2
 
 module.exports =
 	normalize_url: normalize_url

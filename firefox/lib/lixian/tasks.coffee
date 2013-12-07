@@ -1,5 +1,5 @@
 
-{normalize_url} = require 'urls'
+{url_equals} = require 'urls'
 
 class CachedList
 	constructor: (@client) ->
@@ -9,7 +9,7 @@ class CachedList
 		@client.list_tasks_by_page page_index, callback
 	search_array: (url, tasks) ->
 		for t in tasks
-			if t.original_url == url
+			if url_equals t.original_url, url
 				return t
 	search_cached: (url) ->
 		if @total?
