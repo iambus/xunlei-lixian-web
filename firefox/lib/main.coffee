@@ -80,6 +80,9 @@ widget.port.on 'right-click', ->
 	,
 		label: '访问迅雷离线官网'
 		command: -> tabs.open("http://lixian.vip.xunlei.com/task.html")
+	,
+		label: '访问项目主页'
+		command: -> tabs.open("https://github.com/iambus/xunlei-lixian-web")
 	]
 	menu_download_tool_firefox = menu.find 'download_tool_firefox'
 	menu_download_tool_firefox.setAttribute 'checked', prefs.download_tool not in ['dta', 'flashgot']
