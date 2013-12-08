@@ -6,5 +6,18 @@
   "author": "kneo",
   "license": "MPL 2.0",
   "version": "0.0.1",
-  "permissions": {"private-browsing": true}
+  "permissions": {"private-browsing": true},
+  "preferences": [{
+	"name": "download_tool",
+	"type": "menulist",
+	"title": "下载工具",
+	"description": "设置下载文件时使用的工具",
+	"value": "default",
+	 "options": [
+		 {"value": "firefox", "label": "系统"},
+		 {"value": "dta", "label": "DownThemAll!"},
+		 {"value": "flashgot", "label": "FlashGot"}
+	 ]
+    }
+  ]
 }

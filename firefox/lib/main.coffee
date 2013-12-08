@@ -7,6 +7,7 @@ context_menu = require("sdk/context-menu")
 notifications = require("sdk/notifications")
 {storage} = require("sdk/simple-storage")
 {encypt_password} = require('lixian').utils
+{prefs} = require("sdk/simple-prefs")
 
 login_panel = Panel
 	width: 200
@@ -63,30 +64,47 @@ dta = require('dta')
 flashgot = require('flashgot')
 
 
+get_download_tool = ->
+	default_tool = ->
+		notifications.notify
+			text: "You must install DownThemAll or FlashGot"
+	if prefs.download_tool == 'dta'
+		if dta?
+			return dta.download_tasks
+		else
+			notifications.notify
+				text: "DownThemAll! not installed"
+			return ->
+	else if prefs.download_tool == 'flashgot'
+		if flashgot?
+			return flashgot.download_tasks
+		else
+			notifications.notify
+				text: "FlashGot not installed"
+			return ->
+	else
+		return default_tool
+
 download = (urls) ->
 	if Object.prototype.toString.call(urls) == '[object String]'
 		urls = [urls]
 	if urls?.length > 0
-		download_tool = flashgot or dta
-		if download_tool
-			client.super_get urls, ({ok, tasks, finished, reason, response}) ->
-				if ok
-					if finished.length > 0
-						download_tool.download_tasks finished
-					else
-						if tasks.length > 0
-							notifications.notify
-								text: "Task is not ready"
-						else
-							notifications.notify
-								text: "No task found"
+		download_tool = get_download_tool()
+		client.super_get urls, ({ok, tasks, finished, reason, response}) ->
+			if ok
+				if finished.length > 0
+					download_tool finished
 				else
-					notifications.notify
-						text: "Error: #{reason}"
-					console.log response
-		else
-			notifications.notify
-				text: "You must install DownThemAll or FlashGot"
+					if tasks.length > 0
+						notifications.notify
+							text: "Task is not ready"
+					else
+						notifications.notify
+							text: "No task found"
+			else
+				notifications.notify
+					text: "Error: #{reason}"
+				console.log response
 
 
 context_menu.Item
