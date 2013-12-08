@@ -5,5 +5,6 @@
   "description": "用最简单的方式使用迅雷离线",
   "author": "kneo",
   "license": "MPL 2.0",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "permissions": {"private-browsing": true}
 }
