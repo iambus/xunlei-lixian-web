@@ -9,6 +9,8 @@ notifications = require("sdk/notifications")
 {encypt_password} = require('lixian').utils
 {prefs} = require("sdk/simple-prefs")
 
+widget_menu = require 'widget_menu'
+
 login_panel = Panel
 	width: 200
 	height: 140
@@ -40,19 +42,54 @@ require_login = ({username, password, verification_code}, callback) ->
 	login_panel.port.emit 'login', username: username, password: password, save: save, verification_code: verification_code
 	login_panel.show()
 
+widget_id = 'iambus-xunlei-lixian-web-firefox'
+
 widget = Widget
-	id: "mozilla-link"
+	id: widget_id
 	label: "迅雷离线下载"
 	contentURL: self.data.url('xunlei.ico')
+	contentScriptWhen: 'ready',
+	contentScriptFile: self.data.url('content/widget.js')
 #	panel: login_panel
-	onClick: (view) ->
-#		if login_panel.isShowing
-#			login_panel.hide()
-#		else
-#			login_panel.show()
-#		view.panel = login_panel
-		tabs.open("http://lixian.vip.xunlei.com/task.html")
-#		test()
+#	onClick: (view) ->
+#		tabs.open("http://lixian.vip.xunlei.com/task.html")
+widget.port.on 'left-click', ->
+	tabs.open("http://lixian.vip.xunlei.com/task.html")
+widget.port.on 'right-click', ->
+	menu = widget_menu widget_id, 'options', [
+		label: '下载工具'
+		items: [
+			id: 'download_tool_firefox'
+			label: '系统'
+			type: 'radio'
+			command: ->
+				prefs.download_tool = 'firefox'
+		,
+			id: 'download_tool_dta'
+			label: 'DownThemAll!'
+			type: 'radio'
+			command: ->
+				prefs.download_tool = 'dta'
+		,
+			id: 'download_tool_flashgot'
+			label: 'FlashGot'
+			type: 'radio'
+			command: ->
+				prefs.download_tool = 'flashgot'
+		]
+	,
+		label: '访问迅雷离线官网'
+		command: -> tabs.open("http://lixian.vip.xunlei.com/task.html")
+	]
+	menu_download_tool_firefox = menu.find 'download_tool_firefox'
+	menu_download_tool_firefox.setAttribute 'checked', prefs.download_tool not in ['dta', 'flashgot']
+	menu_download_tool_dta = menu.find 'download_tool_dta'
+	menu_download_tool_dta.setAttribute 'checked', prefs.download_tool == 'dta'
+	menu_download_tool_dta.setAttribute 'disabled', not dta
+	menu_download_tool_flashgot = menu.find 'download_tool_flashgot'
+	menu_download_tool_flashgot.setAttribute 'checked', prefs.download_tool == 'flashgot'
+	menu_download_tool_flashgot.setAttribute 'disabled', not flashgot
+	menu.show()
 
 client = require('client').create()
 client.username = storage.username
