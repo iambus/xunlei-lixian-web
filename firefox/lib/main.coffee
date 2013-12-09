@@ -88,10 +88,10 @@ widget.port.on 'right-click', ->
 	menu_download_tool_firefox.setAttribute 'checked', prefs.download_tool not in ['dta', 'flashgot']
 	menu_download_tool_dta = menu.find 'download_tool_dta'
 	menu_download_tool_dta.setAttribute 'checked', prefs.download_tool == 'dta'
-	menu_download_tool_dta.setAttribute 'disabled', not dta
+	menu_download_tool_dta.setAttribute 'disabled', not download_tools.dta
 	menu_download_tool_flashgot = menu.find 'download_tool_flashgot'
 	menu_download_tool_flashgot.setAttribute 'checked', prefs.download_tool == 'flashgot'
-	menu_download_tool_flashgot.setAttribute 'disabled', not flashgot
+	menu_download_tool_flashgot.setAttribute 'disabled', not download_tools.flashgot
 	menu.show()
 
 client = require('client').create()
@@ -100,30 +100,28 @@ client.password = storage.password
 client.require_login = require_login
 client.auto_relogin = true
 
-dta = require('dta')
-flashgot = require('flashgot')
-
+download_tools = require('download_tools')
 
 get_download_tool = ->
-	default_tool = ->
-		notifications.notify
-			text: "You must install DownThemAll or FlashGot"
+#	default_tool = ->
+#		notifications.notify
+#			text: "You must install DownThemAll or FlashGot"
 	if prefs.download_tool == 'dta'
-		if dta?
-			return dta.download_tasks
+		if download_tools.dta?
+			return download_tools.dta.download_tasks
 		else
 			notifications.notify
 				text: "DownThemAll! not installed"
 			return ->
 	else if prefs.download_tool == 'flashgot'
-		if flashgot?
-			return flashgot.download_tasks
+		if download_tools.flashgot?
+			return download_tools.flashgot.download_tasks
 		else
 			notifications.notify
 				text: "FlashGot not installed"
 			return ->
 	else
-		return default_tool
+		return download_tools.firefox.download_tasks
 
 download = (urls) ->
 	if Object.prototype.toString.call(urls) == '[object String]'
@@ -165,4 +163,6 @@ context_menu.Item
 
 
 #tabs.open self.data.url('sample.html')
+
+#exports.onUnload = ->
 
