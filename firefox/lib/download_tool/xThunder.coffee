@@ -12,6 +12,8 @@ download_tasks = (tasks) ->
 
 	xThunder.apiDownUrl referrer, links
 
-
-module.exports =
-	download_tasks: download_tasks
+if xThunder?
+	module.exports =
+		download_tasks: download_tasks
+else
+	module.exports = undefined

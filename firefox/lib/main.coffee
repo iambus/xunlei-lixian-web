@@ -112,39 +112,11 @@ client.auto_relogin = true
 
 download_tools = require('download_tools')
 
-get_download_tool = ->
-#	default_tool = ->
-#		notifications.notify
-#			text: "You must install DownThemAll or FlashGot"
-	if prefs.download_tool == 'dta'
-		if download_tools.dta?
-			return download_tools.dta.download_tasks
-		else
-			notifications.notify
-				text: _('download_tool_dta_error_not_found')
-			return ->
-	else if prefs.download_tool == 'flashgot'
-		if download_tools.flashgot?
-			return download_tools.flashgot.download_tasks
-		else
-			notifications.notify
-				text: _('download_tool_flashgot_error_not_found')
-			return ->
-	else if prefs.download_tool == 'xthunder'
-		if download_tools.xthunder?
-			return download_tools.xthunder.download_tasks
-		else
-			notifications.notify
-				text: _('download_tool_xthunder_error_not_found')
-			return ->
-	else
-		return download_tools.firefox.download_tasks
-
 download = (urls) ->
 	if Object.prototype.toString.call(urls) == '[object String]'
 		urls = [urls]
 	if urls?.length > 0
-		download_tool = get_download_tool()
+		download_tool = download_tools.get()
 		client.super_get urls, ({ok, tasks, finished, reason, response}) ->
 			if ok
 				if finished.length > 0
