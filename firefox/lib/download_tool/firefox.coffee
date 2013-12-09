@@ -1,4 +1,5 @@
 
+_ = require('sdk/l10n').get
 
 {Cc, Ci, Cu} = require("chrome")
 
@@ -20,7 +21,7 @@ download_tasks = (tasks) ->
 		download_file tasks[0].download_url
 	else
 		require("sdk/notifications").notify
-			text: "系统自带的下载工具只能下载单个文件"
+			text: _('download_tool_firefox_error_multiple_file')
 
 
 module.exports =

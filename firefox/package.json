@@ -13,7 +13,7 @@
 	"title": "下载工具",
 	"description": "设置下载文件时使用的工具",
 	"value": "default",
-	 "options": [
+	"options": [
 		 {"value": "firefox", "label": "系统"},
 		 {"value": "dta", "label": "DownThemAll!"},
 		 {"value": "flashgot", "label": "FlashGot"}

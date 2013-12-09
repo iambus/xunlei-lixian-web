@@ -8,6 +8,7 @@ notifications = require("sdk/notifications")
 {storage} = require("sdk/simple-storage")
 {encypt_password} = require('lixian').utils
 {prefs} = require("sdk/simple-prefs")
+_ = require('sdk/l10n').get
 
 widget_menu = require 'widget_menu'
 
@@ -46,7 +47,7 @@ widget_id = 'iambus-xunlei-lixian-web-firefox'
 
 widget = Widget
 	id: widget_id
-	label: "迅雷离线下载"
+	label: _('widget_label')
 	contentURL: self.data.url('xunlei.ico')
 	contentScriptWhen: 'ready',
 	contentScriptFile: self.data.url('content/widget.js')
@@ -57,31 +58,31 @@ widget.port.on 'left-click', ->
 	tabs.open("http://lixian.vip.xunlei.com/task.html")
 widget.port.on 'right-click', ->
 	menu = widget_menu widget_id, 'options', [
-		label: '下载工具'
+		label: _('widget_menu_download_tool')
 		items: [
 			id: 'download_tool_firefox'
-			label: '系统'
+			label: _('widget_menu_download_tool_firefox')
 			type: 'radio'
 			command: ->
 				prefs.download_tool = 'firefox'
 		,
 			id: 'download_tool_dta'
-			label: 'DownThemAll!'
+			label: _('widget_menu_download_tool_dta')
 			type: 'radio'
 			command: ->
 				prefs.download_tool = 'dta'
 		,
 			id: 'download_tool_flashgot'
-			label: 'FlashGot'
+			label: _('widget_menu_download_tool_flashgot')
 			type: 'radio'
 			command: ->
 				prefs.download_tool = 'flashgot'
 		]
 	,
-		label: '访问迅雷离线官网'
+		label: _('widget_menu_web_site')
 		command: -> tabs.open("http://lixian.vip.xunlei.com/task.html")
 	,
-		label: '访问项目主页'
+		label: _('widget_menu_project_site')
 		command: -> tabs.open("https://github.com/iambus/xunlei-lixian-web")
 	]
 	menu_download_tool_firefox = menu.find 'download_tool_firefox'
@@ -111,14 +112,14 @@ get_download_tool = ->
 			return download_tools.dta.download_tasks
 		else
 			notifications.notify
-				text: "DownThemAll! not installed"
+				text: _('download_tool_dta_error_not_found')
 			return ->
 	else if prefs.download_tool == 'flashgot'
 		if download_tools.flashgot?
 			return download_tools.flashgot.download_tasks
 		else
 			notifications.notify
-				text: "FlashGot not installed"
+				text: _('download_tool_flashgot_error_not_found')
 			return ->
 	else
 		return download_tools.firefox.download_tasks
@@ -135,10 +136,10 @@ download = (urls) ->
 				else
 					if tasks.length > 0
 						notifications.notify
-							text: "Task is not ready"
+							text:  _('download_error_task_not_ready')
 					else
 						notifications.notify
-							text: "No task found"
+							text: _('download_error_task_not_found')
 			else
 				notifications.notify
 					text: "Error: #{reason}"
@@ -146,7 +147,7 @@ download = (urls) ->
 
 
 context_menu.Item
-	label: "从迅雷离线下载此链接"
+	label: _('context_menu_download_link')
 	image: self.data.url('xunlei.ico')
 	context: context_menu.SelectorContext('a[href]')
 	contentScriptFile: self.data.url('content/menu/link.js')
@@ -154,7 +155,7 @@ context_menu.Item
 		download [url]
 
 context_menu.Item
-	label: "从迅雷离线下载选中的链接"
+	label: _('context_menu_download_selection')
 	image: self.data.url('xunlei.ico')
 	context: context_menu.SelectionContext()
 	contentScriptFile: self.data.url('content/menu/text.js')
