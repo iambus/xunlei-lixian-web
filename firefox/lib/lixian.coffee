@@ -43,6 +43,7 @@ class Task
 			@[k] = v
 		@type = @protocol = @url.match('^[^:]+')[0].toLowerCase()
 		@name = unescape @taskname
+		@filename = @name
 		@original_url = @url
 		@download_url = @lixian_url
 		@bt_hash = @cid
@@ -59,7 +60,8 @@ class TaskFile
 		@index = @id
 		@id = @taskid
 		@name = @title
-		@root_name = @dirtitle
+		@filename = @name.replace /^.*\\/, ''
+		@dirs = @name.match(/^.*\\/)?[0].split('\\') ? []
 		@original_url = @url
 		@download_url = @downurl
 		@size_text = @size
@@ -442,7 +444,14 @@ class XunleiClient
 		url = "/interface/fill_bt_list?callback=fill_bt_list&tid=#{task.id}&infoid=#{task.bt_hash}&g_net=1&p=1&uid=#{@id}&noCacheIE=#{current_timestamp()}"
 		@set_page_size_in_cokie 9999
 		@get url, ({text}) =>
-			callback @parse_fill_bt_list text
+			result = @parse_fill_bt_list text
+			{ok, files} = result
+			if ok
+				unless files.length == 1 and files[0].name == task.name
+					for file in files
+						file.dirs.unshift task.name
+#						file.dirname = file.dirs.join '/'
+			callback result
 
 ################################################################################
 # export

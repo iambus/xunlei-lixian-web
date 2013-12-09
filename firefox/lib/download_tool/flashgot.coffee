@@ -11,7 +11,7 @@ download_tasks = (tasks) ->
 	for t in tasks
 		links.push
 			href: t.download_url
-			fname: t.name
+			fname: t.filename
 			description: t.name
 
 	gFlashGotService.download links
