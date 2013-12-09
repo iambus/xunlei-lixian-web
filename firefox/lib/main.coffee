@@ -77,6 +77,12 @@ widget.port.on 'right-click', ->
 			type: 'radio'
 			command: ->
 				prefs.download_tool = 'flashgot'
+		,
+			id: 'download_tool_xthunder'
+			label: _('widget_menu_download_tool_xthunder')
+			type: 'radio'
+			command: ->
+				prefs.download_tool = 'xthunder'
 		]
 	,
 		label: _('widget_menu_web_site')
@@ -86,13 +92,16 @@ widget.port.on 'right-click', ->
 		command: -> tabs.open("https://github.com/iambus/xunlei-lixian-web")
 	]
 	menu_download_tool_firefox = menu.find 'download_tool_firefox'
-	menu_download_tool_firefox.setAttribute 'checked', prefs.download_tool not in ['dta', 'flashgot']
+	menu_download_tool_firefox.setAttribute 'checked', prefs.download_tool not in ['dta', 'flashgot', 'xthunder']
 	menu_download_tool_dta = menu.find 'download_tool_dta'
 	menu_download_tool_dta.setAttribute 'checked', prefs.download_tool == 'dta'
 	menu_download_tool_dta.setAttribute 'disabled', not download_tools.dta
 	menu_download_tool_flashgot = menu.find 'download_tool_flashgot'
 	menu_download_tool_flashgot.setAttribute 'checked', prefs.download_tool == 'flashgot'
 	menu_download_tool_flashgot.setAttribute 'disabled', not download_tools.flashgot
+	menu_download_tool_xthunder = menu.find 'download_tool_xthunder'
+	menu_download_tool_xthunder.setAttribute 'checked', prefs.download_tool == 'xthunder'
+	menu_download_tool_xthunder.setAttribute 'disabled', not download_tools.xthunder
 	menu.show()
 
 client = require('client').create()
@@ -120,6 +129,13 @@ get_download_tool = ->
 		else
 			notifications.notify
 				text: _('download_tool_flashgot_error_not_found')
+			return ->
+	else if prefs.download_tool == 'xthunder'
+		if download_tools.xthunder?
+			return download_tools.xthunder.download_tasks
+		else
+			notifications.notify
+				text: _('download_tool_xthunder_error_not_found')
 			return ->
 	else
 		return download_tools.firefox.download_tasks

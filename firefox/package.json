@@ -16,7 +16,8 @@
 	"options": [
 		 {"value": "firefox", "label": "系统"},
 		 {"value": "dta", "label": "DownThemAll!"},
-		 {"value": "flashgot", "label": "FlashGot"}
+		 {"value": "flashgot", "label": "FlashGot"},
+		 {"value": "xthunder", "label": "xThunder"}
 	 ]
     }
   ]
