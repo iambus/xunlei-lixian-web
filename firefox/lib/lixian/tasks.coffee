@@ -163,9 +163,22 @@ super_search = (client, urls, callback) ->
 			callback result
 
 super_get = (client, urls, callback) ->
-	super_add client, urls, (result) ->
+	search_tasks client, urls, (result) ->
 		if result.ok
-			super_search client, result.urls, callback
+			if result.not_found.length > 0
+				tasks = result.tasks
+				super_add client, result.not_found, (result) ->
+					if result.ok
+						search_tasks client, result.urls, (result) ->
+							if result.ok
+								tasks = tasks.concat result.tasks
+								expand_bt_tasks client, tasks, callback
+							else
+								callback result
+					else
+						callback result
+			else
+				expand_bt_tasks client, result.tasks, callback
 		else
 			callback result
 

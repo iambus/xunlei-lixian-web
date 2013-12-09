@@ -39,7 +39,8 @@ magnet_to_infohash = (url) ->
 normalize_url = (url) ->
 	url = url_unmask(url)
 	if url.match /magnet:/
-		throw new Error("Not Implemented")
+#		throw new Error("Not Implemented")
+		return url
 	else if url.match /^ed2k:\/\//
 		hash = parse_ed2k_url_hash_hex url
 		if not hash
@@ -47,18 +48,15 @@ normalize_url = (url) ->
 		return "ed2k:#{hash}"
 	else if url.match /^bt:\/\//
 		return url.toLowerCase()
-	else if url.match /^(http|https|ftp)/
-		return normalize_unicode_url(url)
+	else if url.match /^[0-9a-fA-F]{40}$/
+		return "bt://#{url.toLowerCase()}"
+#	else if url.match /^(http|https|ftp)/
+#		return normalize_unicode_url(url)
 	else
 		return url
 
 url_equals = (u1, u2) ->
-	# TODO: implement all URLs!
-#	normalize_url(u1) == normalize_url(u2)
-	if is_ed2k(u1) and is_ed2k(u2)
-		return parse_ed2k_url_hash_hex(u1) == parse_ed2k_url_hash_hex(u2)
-	else
-		return u1 == u2
+	normalize_url(u1) == normalize_url(u2)
 
 module.exports =
 	normalize_url: normalize_url
