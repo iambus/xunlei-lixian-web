@@ -4,7 +4,7 @@
 crypto_hash = Cc['@mozilla.org/security/hash;1'].createInstance(Ci.nsICryptoHash)
 MD5 = Ci.nsICryptoHash.MD5
 
-unicode_converter =	Cc['@mozilla.org/intl/scriptableunicodeconverter'].	createInstance(Ci.nsIScriptableUnicodeConverter)
+unicode_converter = Cc['@mozilla.org/intl/scriptableunicodeconverter'].createInstance(Ci.nsIScriptableUnicodeConverter)
 unicode_converter.charset = 'UTF-8'
 
 hex_char_code = (code) ->

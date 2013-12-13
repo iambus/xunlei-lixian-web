@@ -182,9 +182,21 @@ super_get = (client, urls, callback) ->
 		else
 			callback result
 
+super_get_bt = (client, url, callback) ->
+	require('http').get_binary url, ({arraybuffer}) ->
+		{Cu} = require 'chrome'
+		{Blob} = Cu.import("resource://gre/modules/Services.jsm", {})
+		blob = new Blob [arraybuffer]
+		client.add_bt_task_by_blob blob, (result) ->
+			if result.ok
+				super_search client, [result.info_hash], callback
+			else
+				callback result
+
 module.exports =
 	search_tasks: search_tasks
 	super_add: super_add
 	super_search: super_search
 	super_get: super_get
+	super_get_bt: super_get_bt
 

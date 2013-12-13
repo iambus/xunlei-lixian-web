@@ -112,27 +112,31 @@ client.auto_relogin = true
 
 download_tools = require('download_tools')
 
+download_with = ({ok, tasks, finished, reason, response}) ->
+	download_tool = download_tools.get() # TODO: check download tool before requests
+	if ok
+		if finished.length > 0
+			download_tool finished
+		else
+			if tasks.length > 0
+				notifications.notify
+					text:  _('download_error_task_not_ready')
+			else
+				notifications.notify
+					text: _('download_error_task_not_found')
+	else
+		notifications.notify
+			text: "Error: #{reason}"
+		console.log response
+
 download = (urls) ->
 	if Object.prototype.toString.call(urls) == '[object String]'
 		urls = [urls]
 	if urls?.length > 0
-		download_tool = download_tools.get()
-		client.super_get urls, ({ok, tasks, finished, reason, response}) ->
-			if ok
-				if finished.length > 0
-					download_tool finished
-				else
-					if tasks.length > 0
-						notifications.notify
-							text:  _('download_error_task_not_ready')
-					else
-						notifications.notify
-							text: _('download_error_task_not_found')
-			else
-				notifications.notify
-					text: "Error: #{reason}"
-				console.log response
+		client.super_get urls, download_with
 
+download_bt = (url) ->
+	client.super_get_bt url, download_with
 
 context_menu.Item
 	label: _('context_menu_download_link')
@@ -140,7 +144,10 @@ context_menu.Item
 	context: context_menu.SelectorContext('a[href]')
 	contentScriptFile: self.data.url('content/menu/link.js')
 	onMessage: (url) ->
-		download [url]
+		if url.match /\.torrent$/i
+			download_bt url
+		else
+			download [url]
 
 context_menu.Item
 	label: _('context_menu_download_selection')

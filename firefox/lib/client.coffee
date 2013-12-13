@@ -4,6 +4,8 @@
 
 XunleiClient.prototype.http_get = require('http').get
 XunleiClient.prototype.http_post = require('http').post
+XunleiClient.prototype.http_upload = require('http').upload
+XunleiClient.prototype.http_form = require('http').form
 
 XunleiClient.prototype.get_domain_cookie = require('cookie').get
 XunleiClient.prototype.set_domain_cookie = require('cookie').set

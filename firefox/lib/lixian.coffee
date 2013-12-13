@@ -102,6 +102,12 @@ class XunleiClient
 	http_post: (url, form, callback) ->
 		throw new Error("Not Implemented: http_post")
 
+	http_upload: (url, form, callback) ->
+		throw new Error("Not Implemented: http_upload")
+
+	http_form: ->
+		throw new Error("Not Implemented: http_upload")
+
 	url: (u) ->
 		join_url(@base_url, u)
 
@@ -111,7 +117,7 @@ class XunleiClient
 			if @auto_relogin and @is_session_timed_out_response(result.text)
 				@auto_login (result) =>
 					if result.ok
-						@http_get url, form, callback
+						@http_get url, callback
 					else
 						callback result
 			else
@@ -128,6 +134,14 @@ class XunleiClient
 						callback result
 			else
 				callback result
+
+	upload: (url, form, callback) -> # support auto-relogin relavant url
+		url = @url url
+		if not @id # TODO: check login properly
+			@auto_login (result) =>
+				@http_upload url, form, callback
+		else
+			@http_upload url, form, callback
 
 	init: (callback) ->
 		if @initialized
@@ -275,11 +289,47 @@ class XunleiClient
 	add_simple_task: (url, callback) ->
 		throw new Error("Not Implemented: add_simple_task")
 
+	add_bt_task_by_blob: (blob, callback) ->
+		upload_url = '/interface/torrent_upload'
+		form = new @http_form()
+		form.append 'filepath', blob, 'attachment.torrent'
+		@upload upload_url, form, ({text}) =>
+			upload_failed = text?.match(/<script>document\.domain="xunlei\.com";var btResult =(\{"ret_value":0\});<\/script>/)?[1]
+			upload_success = text?.match(/<script>document\.domain="xunlei\.com";var btResult =(\{.*\});<\/script>/)?[1]
+			already_exists = text?.match(/parent\.edit_bt_list\((\{.*\}),'','0'\)/)?[1]
+			if upload_failed?
+				callback ok: false, reason: 'Upload failed', response: text
+			else if upload_success?
+				result = JSON.parse upload_success
+				bt_hash = result['infoid']
+				bt_name = result['ftitle']
+				bt_size = result['btsize']
+				form =
+					uid: @id
+					btname: bt_name
+					cid: bt_hash
+					tsize: bt_size
+					findex: (f['id']+'_' for f in result['filelist']).join('')
+					size: (f['subsize']+'_' for f in result['filelist']).join('')
+					from: '0'
+				jsonp = "jsonp#{current_timestamp()}"
+				commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
+				@post commit_url, form, ({text}) ->
+					if text.match "^#{jsonp}\(.*\)"
+						callback ok: true, reason: 'BT task created', info_hash: bt_hash
+					else
+						callback ok: false, reason: 'Failed be parse bt result', response: text
+			else if already_exists?
+				result = JSON.parse already_exists
+				callback ok: true, reason: 'BT task alrady exists', info_hash: result.infoid
+			else
+				callback ok: false, reason: 'Failed be parse upload result', response: text
+
 	parse_queryUrl: (text) ->
 		throw new Error("Not Implemented")
 
 	add_bt_task_by_query_url: (url, callback) ->
-		url = "http://dynamic.cloud.vip.xunlei.com/interface/url_query?callback=queryUrl&u=#{encodeURIComponent url}&random=#{current_timestamp()}"
+		url = "/interface/url_query?callback=queryUrl&u=#{encodeURIComponent url}&random=#{current_timestamp()}"
 		@get url, ({text}) =>
 			m = text.match /^queryUrl(\(1,.*\))\s*$/
 			if m
@@ -317,9 +367,6 @@ class XunleiClient
 			@auto_login =>
 				url = "http://dynamic.cloud.vip.xunlei.com/interface/get_torrent?userid=#{@id}&infoid=#{hash}"
 				@add_bt_task_by_query_url url, callback
-
-	add_bt_task_by_torrent_content: (bytes, callback) ->
-		throw new Error("Not Implemented: add_bt_task_by_torrent_content")
 
 	add_magnet_task: (url, callback) ->
 		# TODO: check session and @id
