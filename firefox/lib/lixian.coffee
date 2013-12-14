@@ -14,6 +14,15 @@ encypt_password = (password) ->
 current_timestamp = ->
 	new Date().getTime()
 
+
+no_cache = (url) ->
+	if url.indexOf '?' == -1
+		url += '?'
+	else
+		url += '&'
+	url += 'nocache=' + current_timestamp()
+
+
 ################################################################################
 # utils
 ################################################################################
@@ -423,7 +432,7 @@ class XunleiClient
 			type_id = 4
 		page = page_index + 1
 		p = 1 # XXX: what is it?
-		url = "/interface/showtask_unfresh?type_id=#{type_id}&page=#{page}&tasknum=#{page_size}&p=#{p}&interfrom=task"
+		url = no_cache "/interface/showtask_unfresh?type_id=#{type_id}&page=#{page}&tasknum=#{page_size}&p=#{p}&interfrom=task"
 		return url
 
 	parse_rebuild: (text) ->
