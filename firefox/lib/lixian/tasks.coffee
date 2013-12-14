@@ -187,9 +187,23 @@ super_get_bt = (client, url, callback) ->
 		{Cu} = require 'chrome'
 		{Blob} = Cu.import("resource://gre/modules/Services.jsm", {})
 		blob = new Blob [arraybuffer]
-		client.add_bt_task_by_blob blob, (result) ->
+		client.upload_torrent_file_by_blob blob, (result) ->
 			if result.ok
-				super_search client, [result.info_hash], callback
+				if result.done
+					super_search client, [result.info_hash], callback
+				else
+					super_search client, [result.info_hash], (result) ->
+						if result.ok
+							if result.tasks.length == 0 and result.skipped == 1
+								client.commit_bt_task result, (result) ->
+									if result.ok
+										super_search client, [result.info_hash], callback
+									else
+										callback result
+							else
+								callback result
+						else
+							callback result
 			else
 				callback result
 

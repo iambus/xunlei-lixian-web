@@ -298,7 +298,7 @@ class XunleiClient
 	add_simple_task: (url, callback) ->
 		throw new Error("Not Implemented: add_simple_task")
 
-	add_bt_task_by_blob: (blob, callback) ->
+	upload_torrent_file_by_blob: (blob, callback) ->
 		upload_url = '/interface/torrent_upload'
 		form = new @http_form()
 		form.append 'filepath', blob, 'attachment.torrent'
@@ -310,60 +310,73 @@ class XunleiClient
 				callback ok: false, reason: 'Upload failed', response: text
 			else if upload_success?
 				result = JSON.parse upload_success
-				bt_hash = result['infoid']
-				bt_name = result['ftitle']
-				bt_size = result['btsize']
-				form =
-					uid: @id
-					btname: bt_name
-					cid: bt_hash
-					tsize: bt_size
-					findex: (f['id']+'_' for f in result['filelist']).join('')
-					size: (f['subsize']+'_' for f in result['filelist']).join('')
-					from: '0'
-				jsonp = "jsonp#{current_timestamp()}"
-				commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
-				@post commit_url, form, ({text}) ->
-					if text.match "^#{jsonp}\(.*\)"
-						callback ok: true, reason: 'BT task created', info_hash: bt_hash
-					else
-						callback ok: false, reason: 'Failed be parse bt result', response: text
+				callback
+					ok: true
+					done: false
+					info_hash: result['infoid']
+					name: result['ftitle']
+					size: result['btsize']
+					files: (id: x.id, name: x.subtitle, size: x.subsize for x in result['filelist'])
 			else if already_exists?
 				result = JSON.parse already_exists
-				callback ok: true, reason: 'BT task alrady exists', info_hash: result.infoid
+				callback
+					ok: true
+					done: true
+					info_hash: result['infoid']
 			else
 				callback ok: false, reason: 'Failed be parse upload result', response: text
 
-	parse_queryUrl: (text) ->
-		throw new Error("Not Implemented")
 
-	add_bt_task_by_query_url: (url, callback) ->
+	commit_bt_task: ({info_hash, name, size, files}, callback) ->
+		form =
+			uid: @id
+			btname: name
+			cid: info_hash
+			tsize: size
+			findex: (f['id']+'_' for f in files).join('')
+			size: (f['size']+'_' for f in files).join('')
+			from: '0'
+		jsonp = "jsonp#{current_timestamp()}"
+		commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
+		@post commit_url, form, ({text}) ->
+			if text.match "^#{jsonp}\(.*\)"
+				callback ok: true, reason: 'BT task created', info_hash: info_hash
+			else
+				callback ok: false, reason: 'Failed be parse bt result', response: text
+
+	add_bt_task_by_blob: (blob, callback) ->
+		@upload_torrent_file_by_blob blob, (result) =>
+			if result.ok and not result.done
+				@commit_bt_task result, callback
+			else
+				callback result
+
+	query_bt_task_by_url: (url, callback) ->
 		url = "/interface/url_query?callback=queryUrl&u=#{encodeURIComponent url}&random=#{current_timestamp()}"
 		@get url, ({text}) =>
 			m = text.match /^queryUrl(\(1,.*\))\s*$/
 			if m
 				[_, cid, tsize, btname, _, names, sizes_, sizes, _, types, findexes, timestamp, _] = @parse_queryUrl text
-				form =
-					uid: @id
-					btname: btname
-					cid: cid
-					tsize: tsize
-					findex: (x+'_' for x in findexes).join('')
-					size: (x+'_' for x in sizes).join('')
-					from: '0'
-				jsonp = "jsonp#{current_timestamp()}"
-				commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
-				@post commit_url, form, ({text}) ->
-					if text.match "^#{jsonp}\(.*\)"
-						callback ok: true, reason: 'BT task created', info_hash: cid
-					else
-						callback ok: false, reason: 'Failed be parse bt result', response: text
+				callback
+					ok: true
+					done: false
+					info_hash: cid
+					name: btname
+					size: tsize
+					files: (name: name, id: findexes[i], size: sizes[i] for name, i in names)
 			else
 				m = text.match /^queryUrl\(-1,'([^']{40})/
 				if m
-					callback ok: true, reason: 'BT task alrady exists', info_hash: m[1]
+					callback ok: true, done: true, reason: 'BT task alrady exists', info_hash: m[1]
 				else
 					callback ok: false, reason: 'Failed to add bt task', response: text
+
+	add_bt_task_by_query_url: (url, callback) ->
+		@query_bt_task_by_url url, (result) =>
+			if result.ok and not result.done
+				@commit_bt_task result, callback
+			else
+				callback result
 
 	add_bt_task_by_info_hash: (hash, callback) ->
 		hash = hash.toUpperCase()

@@ -31,6 +31,7 @@ http_post = (url, form, callback) ->
 	request.post()
 
 http_get_binary = (url, callback) ->
+	console.log 'GET [binary] ' + url
 #	{Cc, Ci} = require 'chrome'
 #	request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIJSXMLHttpRequest)
 #	request.open 'GET', url
@@ -57,6 +58,7 @@ http_get_binary = (url, callback) ->
 	request.send null
 
 http_upload = (url, form, callback) ->
+	console.log 'UPLOAD ' + url
 	{XMLHttpRequest} = require('sdk/net/xhr')
 	request = new XMLHttpRequest
 	request.open 'POST', url
