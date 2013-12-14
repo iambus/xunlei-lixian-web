@@ -4,10 +4,10 @@ window_utils = require('sdk/window/utils')
 NS_XUL = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
 
 full_widget_id = (widget_id) ->
-	"widget:#{require('self').id}-#{widget_id}"
+	"widget:#{require('sdk/self').id}-#{widget_id}"
 
 full_menu_id = (widget_id) ->
-	"menu:#{require('self').id}-#{widget_id}"
+	"menu:#{require('sdk/self').id}-#{widget_id}"
 
 create_simple_menu_item = (doc, {label, id, type, command}) ->
 	menuitem = doc.createElementNS(NS_XUL, 'menuitem')
