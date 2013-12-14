@@ -44,8 +44,9 @@ XunleiClient.prototype.parse_queryUrl = (text) ->
 tasks = require('lixian/tasks')
 
 for n, f of tasks
-	XunleiClient.prototype[n] = (args...) ->
-		f.call null, @, args...
+	do (f) ->
+		XunleiClient.prototype[n] = (args...) ->
+			f.call null, @, args...
 
 module.exports =
 	create: -> new XunleiClient
