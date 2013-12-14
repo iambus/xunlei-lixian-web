@@ -19,6 +19,12 @@
 		 {"value": "flashgot", "label": "FlashGot"},
 		 {"value": "xthunder", "label": "xThunder"}
 	 ]
+    },{
+	"name": "associate_types",
+	"type": "bool",
+	"title": "关联",
+	"description": "关联ed2k和magnet打开方式",
+	"value": false
     }
   ]
 }

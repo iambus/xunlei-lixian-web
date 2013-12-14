@@ -85,6 +85,12 @@ widget.port.on 'right-click', ->
 				prefs.download_tool = 'xthunder'
 		]
 	,
+		id: 'associate_types'
+		label: _('widget_menu_associate_type')
+		type: 'checkbox'
+		command: ->
+			prefs.associate_types = @getAttribute('checked') == 'true'
+	,
 		label: _('widget_menu_web_site')
 		command: -> tabs.open("http://lixian.vip.xunlei.com/task.html")
 	,
@@ -102,6 +108,8 @@ widget.port.on 'right-click', ->
 	menu_download_tool_xthunder = menu.find 'download_tool_xthunder'
 	menu_download_tool_xthunder.setAttribute 'checked', prefs.download_tool == 'xthunder'
 	menu_download_tool_xthunder.setAttribute 'disabled', not download_tools.xthunder
+	menu_associate_types = menu.find 'associate_types'
+	menu_associate_types.setAttribute 'checked', prefs.associate_types
 	menu.show()
 
 client = require('client').create()
@@ -158,7 +166,17 @@ context_menu.Item
 		download urls
 
 
-#tabs.open self.data.url('sample.html')
+API =
+	download_url: (url) -> download [url]
+
+require('api') API
+require("sdk/simple-prefs").on 'associate_types', ->
+	types = ['ed2k', 'magnet']
+	if prefs.associate_types
+		require('protocol').associate_types types, true
+	else
+		require('protocol').disassociate_types types
+
 
 #exports.onUnload = ->
 
