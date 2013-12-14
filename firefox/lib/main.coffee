@@ -177,6 +177,10 @@ require("sdk/simple-prefs").on 'associate_types', ->
 	else
 		require('protocol').disassociate_types types
 
+require("sdk/system/unload").when ->
+	types = ['ed2k', 'magnet']
+	require('protocol').disassociate_types types
+
 
 #exports.onUnload = ->
 

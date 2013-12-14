@@ -38,12 +38,13 @@ unregister_handler = (type) ->
 		handler = handlers.queryElementAt(i, Ci.nsIHandlerApp)
 		if handler.name == handler_name
 			handlers.removeElementAt i
-			break
-	handler_info.alwaysAskBeforeHandling = true
-	handler_info.preferredApplicationHandler = undefined
 
-	handler_service = Cc["@mozilla.org/uriloader/handler-service;1"].getService(Ci.nsIHandlerService)
-	handler_service.store handler_info
+			handler_info.alwaysAskBeforeHandling = true
+			handler_info.preferredApplicationHandler = undefined
+
+			handler_service = Cc["@mozilla.org/uriloader/handler-service;1"].getService(Ci.nsIHandlerService)
+			handler_service.store handler_info
+			return
 
 associate_types = (types, overwrite) ->
 	for type in types
