@@ -28,8 +28,7 @@ select_folder = (callback) ->
 download_multiple_tasks = (tasks) ->
 	dta = require('download_tools').dta
 	if not dta?
-		require("sdk/notifications").notify
-			text: _('download_tool_firefox_error_multiple_file_no_dta')
+		require('notify') _('download_tool_firefox_error_multiple_file_no_dta')
 		return
 	select_folder (folder) ->
 		dta.download_tasks_to_dir tasks, folder.path

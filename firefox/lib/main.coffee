@@ -4,7 +4,7 @@
 tabs = require("sdk/tabs")
 self = require("sdk/self")
 context_menu = require("sdk/context-menu")
-notifications = require("sdk/notifications")
+notify = require("notify")
 {storage} = require("sdk/simple-storage")
 {encypt_password} = require('lixian').utils
 {prefs} = require("sdk/simple-prefs")
@@ -127,14 +127,11 @@ download_with = ({ok, tasks, finished, reason, response}) ->
 			download_tool finished
 		else
 			if tasks.length > 0
-				notifications.notify
-					text:  _('download_error_task_not_ready')
+				notify  _('download_error_task_not_ready')
 			else
-				notifications.notify
-					text: _('download_error_task_not_found')
+				notify _('download_error_task_not_found')
 	else
-		notifications.notify
-			text: "Error: #{reason}"
+		notify "Error: #{reason}"
 		console.log response
 
 download = (urls) ->

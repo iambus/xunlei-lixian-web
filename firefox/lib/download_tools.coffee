@@ -6,7 +6,6 @@ flashgot = require('download_tool/flashgot')
 xthunder = require('download_tool/xthunder')
 
 {prefs} = require("sdk/simple-prefs")
-notifications = require("sdk/notifications")
 
 tools =
 	firefox: firefox
