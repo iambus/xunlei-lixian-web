@@ -14,16 +14,16 @@ window_utils = require('sdk/window/utils')
 {setTimeout} = require('sdk/timers')
 NS_XUL = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
 
+notificationbox_id = 'xunlei-lixian-web-notificationbox'
 get_notification_box_in_status_bar = ->
 #	window_utils.getMostRecentBrowserWindow().gBrowser.getNotificationBox()
 	doc = window_utils.getMostRecentBrowserWindow().document
-	box_id = 'xunlei-lixian-web-notificationbox'
-	notification_box = doc.getElementById box_id
+	notification_box = doc.getElementById notificationbox_id
 	if notification_box?
 		return notification_box
 
 	notification_box = doc.createElementNS(NS_XUL, 'notificationbox')
-	notification_box.setAttribute 'id', box_id
+	notification_box.setAttribute 'id', notificationbox_id
 	notification_box.setAttribute 'dir', 'reverse'
 
 	addon_bar = doc.getElementById 'addon-bar'
@@ -73,5 +73,12 @@ notify = (message) ->
 	if Object.prototype.toString.call(message) != '[object Object]'
 		message = message: message
 	notify_in_status_bar message
+
+
+require("sdk/system/unload").when ->
+	for w in window_utils.windows()
+		box = w.document.getElementById notificationbox_id
+		if box?
+			box.parentNode.removeChild box
 
 module.exports = notify
