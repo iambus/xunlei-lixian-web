@@ -1,7 +1,7 @@
 
-xul = require 'xul'
+main_window = require('sdk/window/utils').getMostRecentBrowserWindow()
 
-xThunder = xul.globals.xThunder
+xThunder = main_window.xThunder
 
 download_tasks = (tasks) ->
 	referrer = 'http://dynamic.cloud.vip.xunlei.com/'

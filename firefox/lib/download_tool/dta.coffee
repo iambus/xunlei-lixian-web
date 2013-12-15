@@ -1,7 +1,7 @@
 
-xul = require 'xul'
+main_window = require('sdk/window/utils').getMostRecentBrowserWindow()
 
-DTA = xul.globals.DTA
+DTA = main_window.DTA
 #{Cu} = require 'chrome'
 #glue = {}
 #Cu.import("chrome://dta-modules/content/glue.jsm", glue)
@@ -21,7 +21,7 @@ download_tasks = (tasks) ->
 			ultDescription: t.name
 
 #	console.log links
-	DTA.saveLinkArray xul.main, links, []
+	DTA.saveLinkArray main_window, links, []
 
 download_tasks_to_dir = (tasks, dirname) ->
 	referer = 'http://dynamic.cloud.vip.xunlei.com/'
@@ -45,8 +45,8 @@ download_tasks_to_dir = (tasks, dirname) ->
 			mask: mask
 
 #	console.log links
-#	DTA.turboSendLinksToManager xul.main, links
-	DTA.sendLinksToManager xul.main, true, links
+#	DTA.turboSendLinksToManager main_window, links
+	DTA.sendLinksToManager main_window, true, links
 
 
 if DTA?
