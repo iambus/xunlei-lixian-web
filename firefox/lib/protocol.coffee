@@ -7,6 +7,7 @@ handler_name = '迅雷离线下载'
 create_handler = ->
 	handler = Cc["@mozilla.org/uriloader/web-handler-app;1"].createInstance(Ci.nsIWebHandlerApp)
 	handler.name = handler_name
+	handler.detailedDescription = handler_name
 	handler.uriTemplate = 'chrome://xunlei-lixian-web/content/protocol.xul?%s'
 	return handler
 
@@ -55,7 +56,7 @@ disassociate_types = (types) ->
 		unregister_handler type
 
 setup = ->
-	associated_types = ['ed2k', 'magnet']
+	associated_types = ['ed2k', 'magnet', 'bt']
 	simple_prefs = require("sdk/simple-prefs")
 
 	simple_prefs.on 'associate_types', ->
