@@ -127,11 +127,11 @@ download_with = ({ok, tasks, finished, reason, response}) ->
 			download_tool finished
 		else
 			if tasks.length > 0
-				notify  _('download_error_task_not_ready')
+				notify type: 'warning', message: _('download_error_task_not_ready')
 			else
-				notify _('download_error_task_not_found')
+				notify type: 'error', message: _('download_error_task_not_found')
 	else
-		notify "Error: #{reason}"
+		notify type: 'error', message: "Error: #{reason}"
 		console.log response
 
 download = (urls) ->
