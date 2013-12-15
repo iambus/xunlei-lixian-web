@@ -134,7 +134,7 @@ download_with = ({ok, tasks, finished, skipped, reason, response}) ->
 			else
 				notify type: 'error', message: _('download_error_task_not_found')
 	else
-		notify type: 'error', message: "Error: #{reason}"
+		notify type: 'error', message:  _('download_error', reason)
 		console.log response
 
 download = (urls) ->

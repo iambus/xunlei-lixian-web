@@ -6,6 +6,8 @@
   "author": "kneo",
   "license": "MPL 2.0",
   "version": "0.0.1",
+  "homepage": "https://github.com/iambus/xunlei-lixian-web",
+  "icon": "data/xunlei.ico",
   "permissions": {"private-browsing": true},
   "preferences": [{
 	"name": "download_tool",
