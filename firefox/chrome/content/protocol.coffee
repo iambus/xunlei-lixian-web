@@ -1,8 +1,9 @@
 
 url = decodeURIComponent document.location.search.substr(1)
 
+Ci = Components.interfaces
+
 getTopLevelWindowContext = ->
-	Ci = Components.interfaces
 	window.QueryInterface(Ci.nsIInterfaceRequestor)
 		.getInterface(Ci.nsIWebNavigation)
 		.QueryInterface(Ci.nsIDocShellTreeItem)
@@ -10,8 +11,15 @@ getTopLevelWindowContext = ->
 		.QueryInterface(Ci.nsIInterfaceRequestor)
 		.getInterface(Ci.nsIDOMWindow)
 
+getBrowser = ->
+	window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIWebNavigation)
+
 if url
 	getTopLevelWindowContext().XUNLEI_LIXIAN_WEB?.download_url url
 
-window.close()
+browser = getBrowser()
+if browser.canGoBack
+	browser.goBack()
+else
+	window.close()
 
