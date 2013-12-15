@@ -170,16 +170,7 @@ API =
 	download_url: (url) -> download [url]
 
 require('api') API
-require("sdk/simple-prefs").on 'associate_types', ->
-	types = ['ed2k', 'magnet']
-	if prefs.associate_types
-		require('protocol').associate_types types, true
-	else
-		require('protocol').disassociate_types types
-
-require("sdk/system/unload").when ->
-	types = ['ed2k', 'magnet']
-	require('protocol').disassociate_types types
+require('protocol').setup()
 
 
 #exports.onUnload = ->

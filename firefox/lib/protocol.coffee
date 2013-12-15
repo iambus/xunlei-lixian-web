@@ -54,6 +54,25 @@ disassociate_types = (types) ->
 	for type in types
 		unregister_handler type
 
+setup = ->
+	associated_types = ['ed2k', 'magnet']
+	simple_prefs = require("sdk/simple-prefs")
+
+	simple_prefs.on 'associate_types', ->
+		if simple_prefs.prefs.associate_types
+			associate_types associated_types, true
+		else
+			disassociate_types associated_types
+
+	if simple_prefs.prefs.associate_types
+		associate_types associated_types, false
+
+	require("sdk/system/unload").when ->
+		disassociate_types associated_types
+
+
+
 module.exports =
 	associate_types: associate_types
 	disassociate_types: disassociate_types
+	setup: setup
