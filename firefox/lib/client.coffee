@@ -12,13 +12,7 @@ XunleiClient.prototype.set_domain_cookie = require('cookie').set
 
 utils.md5 = require('md5')
 
-{Cc, Ci} = require("chrome")
-timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer)
-utils.setTimeout = (callback, ms) ->
-	event =
-		notify: (timer) ->
-			callback()
-	timer.initWithCallback event, ms, Ci.nsITimer.TYPE_ONE_SHOT
+utils.setTimeout = require('sdk/timers').setTimeout
 
 
 {Cu} = require("chrome")
@@ -47,6 +41,12 @@ for n, f of tasks
 	do (f) ->
 		XunleiClient.prototype[n] = (args...) ->
 			f.call null, @, args...
+
+
+_ = require('sdk/l10n').get
+tasks.define_logger (k, args...) ->
+	message = _ 'download_status_' + k, args...
+	require('notify') type: 'info', message: message, duration: 'forever'
 
 module.exports =
 	create: -> new XunleiClient

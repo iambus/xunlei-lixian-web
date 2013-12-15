@@ -32,7 +32,7 @@ get_notification_box_in_status_bar = ->
 	return notification_box
 
 notify_id = 0
-notify_in_status_bar = ({type, message}) ->
+notify_in_status_bar = ({type, message, duration}) ->
 	notification_box = get_notification_box_in_status_bar()
 	old_id = notify_id
 	id = ++notify_id
@@ -64,9 +64,10 @@ notify_in_status_bar = ({type, message}) ->
 			notification_box.removeNotification element
 	if old_id
 		clear_notification old_id
-	setTimeout ->
-		clear_notification id
-	, (durations[type] ? durations.default) * 1000
+	if duration != 'forever'
+		setTimeout ->
+			clear_notification id
+		, duration ? (durations[type] ? durations.default) * 1000
 
 notify = (message) ->
 	if Object.prototype.toString.call(message) != '[object Object]'

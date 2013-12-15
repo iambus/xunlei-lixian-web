@@ -120,11 +120,14 @@ client.auto_relogin = true
 
 download_tools = require('download_tools')
 
-download_with = ({ok, tasks, finished, reason, response}) ->
+download_with = ({ok, tasks, finished, skipped, reason, response}) ->
 	download_tool = download_tools.get() # TODO: check download tool before requests
 	if ok
 		if finished.length > 0
+			notify type: 'success', message: _('download_status_done')
 			download_tool finished
+			if skipped.length > 0
+				notify type: 'warning', message: _('download_warning_skipped')
 		else
 			if tasks.length > 0
 				notify type: 'warning', message: _('download_error_task_not_ready')

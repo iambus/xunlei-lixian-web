@@ -1,11 +1,14 @@
 
 {url_equals} = require 'urls'
 
+logging = (k, args...) ->
+
 class CachedList
 	constructor: (@client) ->
 		@tasks = []
 		@done = false
 	fetch: (page_index, callback) ->
+		logging 'listing_tasks', page_index
 		@client.list_tasks_by_page page_index, callback
 	search_array: (url, tasks) ->
 		for t in tasks
@@ -67,6 +70,7 @@ search_tasks = (client, urls, callback) ->
 							callback result
 					return
 		callback ok: true, tasks: tasks, not_found: not_found
+	logging 'searching'
 	search()
 
 add_bt_tasks = (client, urls, callback) ->
@@ -143,6 +147,7 @@ expand_bt_tasks = (client, tasks, callback) ->
 				if task.type != 'bt'
 					expanded.push task
 				else
+					logging 'listing_bt'
 					client.list_bt task, (result) ->
 						if result.ok
 							expanded.push file for file in result.files
@@ -183,10 +188,12 @@ super_get = (client, urls, callback) ->
 			callback result
 
 super_get_bt = (client, url, callback) ->
+	logging 'downloading_torrent', url
 	require('http').get_binary url, ({arraybuffer}) ->
 		{Cu} = require 'chrome'
 		{Blob} = Cu.import("resource://gre/modules/Services.jsm", {})
 		blob = new Blob [arraybuffer]
+		logging 'uploading_torrent'
 		client.upload_torrent_file_by_blob blob, (result) ->
 			if result.ok
 				if result.done
@@ -195,6 +202,7 @@ super_get_bt = (client, url, callback) ->
 					super_search client, [result.info_hash], (result) ->
 						if result.ok
 							if result.tasks.length == 0 and result.skipped == 1
+								logging 'adding_bt'
 								client.commit_bt_task result, (result) ->
 									if result.ok
 										super_search client, [result.info_hash], callback
@@ -213,4 +221,6 @@ module.exports =
 	super_search: super_search
 	super_get: super_get
 	super_get_bt: super_get_bt
+	define_logger: (logger) ->
+		logging = logger
 
