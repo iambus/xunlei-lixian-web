@@ -1,8 +1,15 @@
 <!ENTITY title "Select files to download">
+
 <!ENTITY button.ok "Download">
 <!ENTITY button.cancel "Cancel">
+
 <!ENTITY column.file "File">
 
 <!ENTITY output.label "Sav files to:">
 <!ENTITY output.tooltip "Browser output folder">
+
+<!ENTITY option.all.label "Select All">
+<!ENTITY option.all.tooltip "Select all files">
+<!ENTITY option.all.hide-incomplete "Hide Unfinished">
+<!ENTITY option.all.hide-incomplete "Hide unfinished files">
 

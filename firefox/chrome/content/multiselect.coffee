@@ -8,6 +8,14 @@ set_properties = (node, properties) ->
 			keys.push k
 	node.setAttribute 'properties', keys.join('')
 
+document.getElementById('check-all').addEventListener 'command', ->
+	for checkbox in document.querySelectorAll "#files treechildren treerow[status='completed'] treecell.checkbox"
+		checkbox.setAttribute 'value', @checked
+
+document.getElementById('hide-incomplete').addEventListener 'command', ->
+	for treerow in document.querySelectorAll "#files treechildren treerow:not([status='completed'])"
+		treerow.parentNode.hidden = @checked
+
 window.load = (tasks) ->
 	all_tasks = tasks
 
@@ -26,6 +34,7 @@ window.load = (tasks) ->
 		checkbox = document.createElement('treecell')
 		checkbox.setAttribute 'value', t.status_text == 'completed'
 		checkbox.setAttribute 'editable', t.status_text == 'completed'
+		checkbox.setAttribute 'class', 'checkbox'
 		set_properties checkbox,
 			disabled: t.status_text != 'completed'
 		checkbox.onclick = ->
