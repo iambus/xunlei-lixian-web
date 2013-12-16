@@ -43,7 +43,7 @@ save_output_folder = (dir) ->
 			dirs.splice(i, 1)
 			break
 	dirs.unshift dirs
-	storage.output_directories = dir
+	storage.output_directories = dirs
 
 select_folder = (win, default_dir, callback) ->
 	if arguments.length == 1
