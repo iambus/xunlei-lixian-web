@@ -1,0 +1,29 @@
+treechildren::-moz-tree-checkbox {
+    background-image: url("checkbox_off.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+treechildren::-moz-tree-checkbox(checked) {
+    background-image: url("checkbox_on.svg");
+}
+treechildren::-moz-tree-checkbox(disabled) {
+    background-image: url("checkbox_none.svg");
+}
+treecell[value='true'] {
+    background-color: lightgreen;
+}
+
+treecell[value='true'] + treecell {
+    background-color: lightgreen;
+}
+
+treechildren::-moz-tree-row(checked) {
+    background-color: lightgreen;
+}
+treechildren::-moz-tree-cell-text(disabled) {
+    color: grey !important;
+}
+
+#browse {
+    list-style-image: url("chrome://global/skin/dirListing/folder.png")
+}

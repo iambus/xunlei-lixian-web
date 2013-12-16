@@ -5,7 +5,9 @@ every_window = (callback) ->
 			callback w
 
 	require('sdk/system/events').on 'toplevel-window-ready', (event) ->
-		callback event.subject
+		w = event.subject
+		if w.document.documentElement.getAttribute('windowtype') == 'navigator:browser' and w.location.href == 'chrome://browser/content/browser.xul'
+			callback w
 	, true # XXX: should I release it manually?
 
 API_KEY = 'XUNLEI_LIXIAN_WEB'

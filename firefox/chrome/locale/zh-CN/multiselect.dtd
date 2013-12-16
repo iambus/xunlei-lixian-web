@@ -1,0 +1,8 @@
+<!ENTITY title "请选择要下载的文件">
+<!ENTITY button.ok "下载">
+<!ENTITY button.cancel "取消">
+<!ENTITY column.file "文件">
+
+<!ENTITY output.label "下载到：">
+<!ENTITY output.tooltip "浏览目标文件夹...">
+

@@ -1,1 +1,6 @@
 content xunlei-lixian-web chrome/content/
+
+skin xunlei-lixian-web classic/1.0 chrome/skin/
+
+locale xunlei-lixian-web en-US chrome/locale/en-US/
+locale xunlei-lixian-web zh-CN chrome/locale/zh-CN/

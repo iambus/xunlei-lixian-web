@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>
+    <g transform='scale(0.6) translate(-2, 1)'>
+    <path stroke='gray' stroke-width='3'
+          d="M 21,7 C 20,8 10,20 8,21 M 7,7 c 7,6 11,10 14,14"/>
+    </g>
+</svg>

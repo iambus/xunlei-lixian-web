@@ -51,8 +51,9 @@ class Task
 		for k, v of json
 			@[k] = v
 		@type = @protocol = @url.match('^[^:]+')[0].toLowerCase()
-		@name = unescape @taskname
+		@name = unescape(@taskname).replace /(&amp;)+/g, '&'
 		@filename = @name
+		@full_path = @filename
 		@original_url = @url
 		@download_url = @lixian_url
 		@bt_hash = @cid
@@ -68,9 +69,10 @@ class TaskFile
 		@type = 'bt'
 		@index = @id
 		@id = @taskid
-		@name = @title
+		@name = @title.replace /(&amp;)+/g, '&'
 		@filename = @name.replace /^.*\\/, ''
 		@dirs = @name.match(/^.*\\/)?[0].split('\\') ? []
+		@full_path = @dirs.concat([@filename]).join('/')
 		@original_url = @url
 		@download_url = @downurl
 		@size_text = @size
@@ -520,6 +522,7 @@ class XunleiClient
 					for file in files
 						file.dirs.unshift task.name
 #						file.dirname = file.dirs.join '/'
+						file.full_path = task.name + '/' + task.full_path
 			callback result
 
 ################################################################################
