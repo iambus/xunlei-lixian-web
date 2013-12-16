@@ -125,7 +125,7 @@ download_with = ({ok, tasks, finished, skipped, reason, response}) ->
 	if ok
 		if finished.length > 0
 			notify type: 'success', message: _('download_status_done')
-			download_tool finished
+			download_tool tasks
 			if skipped.length > 0
 				notify type: 'warning', message: _('download_warning_skipped')
 		else

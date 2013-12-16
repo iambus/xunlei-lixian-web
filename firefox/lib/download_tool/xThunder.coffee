@@ -8,6 +8,8 @@ download_tasks = (tasks) ->
 
 	links = []
 	for t in tasks
+		if t.status_text != 'completed'
+			continue
 		links.push t.download_url
 
 	xThunder.apiDownUrl referrer, links

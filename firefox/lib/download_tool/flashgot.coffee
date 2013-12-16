@@ -9,6 +9,8 @@ download_tasks = (tasks) ->
 	links.referrer = referrer
 
 	for t in tasks
+		if t.status_text != 'completed'
+			continue
 		links.push
 			href: t.download_url
 			fname: t.filename

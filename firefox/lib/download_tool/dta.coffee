@@ -13,6 +13,8 @@ download_tasks = (tasks) ->
 	links = []
 
 	for t in tasks
+		if t.status_text != 'completed'
+			continue
 		links.push
 			url: new DTA.URL DTA.IOService.newURI t.download_url, 'utf-8', null
 			referrer: referer
@@ -33,6 +35,8 @@ download_tasks_to_dir = (tasks, dirname) ->
 	links = []
 
 	for t in tasks
+		if t.status_text != 'completed'
+			continue
 		dir = if t.dirs?.length then join_path.call(null, dirname, t.dirs...) else dirname
 		links.push
 			url: new DTA.URL DTA.IOService.newURI t.download_url, 'utf-8', null
