@@ -2,7 +2,7 @@
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
 <?xml-stylesheet href="/skin/multiselect.css" type="text/css"?>
 <!DOCTYPE dialog SYSTEM "/locale/multiselect.dtd">
-<dialog title="&title;" width="400" height="300"
+<dialog title="&title;" width="600" height="400"
         persist="width height screenX screenY"
         buttonlabelaccept="&button.ok;" buttonlabelcancel="&button.cancel;"
         ondialogaccept='save()'
@@ -19,16 +19,29 @@
         </treechildren>
 
     </tree>
-    <vbox autostretch="never">
-        <caption label="&output.label;"/>
-        <hbox>
-            <menulist id='output' editable="true" label="" flex="1">
-                <menupopup>
-                </menupopup>
-            </menulist>
-            <toolbarbutton id='browse' tooltiptext="&output.tooltip;"/>
-        </hbox>
-    </vbox>
+    <hbox>
+        <vbox autostretch="never" flex="1">
+            <caption label="&output.label;"/>
+            <hbox>
+                <menulist id='output' editable="true" label="" flex="1">
+                    <menupopup>
+                    </menupopup>
+                </menulist>
+                <toolbarbutton id='browse' tooltiptext="&output.tooltip;"/>
+            </hbox>
+        </vbox>
+        <vbox autostretch="never">
+            <caption label="&tool.label;"/>
+            <hbox>
+                <menulist id='tool' label="&tool.dta;" flex="1">
+                    <menupopup>
+                        <menuitem id="tool-firefox" label='&tool.firefox;' value='firefox'/>
+                        <menuitem id="tool-dta" label='&tool.dta;' value='dta'/>
+                    </menupopup>
+                </menulist>
+            </hbox>
+        </vbox>
+    </hbox>
     <checkbox id="check-all" checked="true" label="&option.all.label;" tooltiptext="&option.all.tooltip;"/>
     <checkbox id="hide-incomplete" checked="false" label="&option.hide-incomplete.label;" tooltiptext="&option.hide-incomplete.tooltip;"/>
     <script type="application/javascript" src="multiselect.js"/>

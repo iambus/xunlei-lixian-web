@@ -5,8 +5,12 @@
 
 <!ENTITY column.file "File">
 
-<!ENTITY output.label "Sav files to:">
+<!ENTITY output.label "Save files to:">
 <!ENTITY output.tooltip "Browser output folder">
+
+<!ENTITY tool.label "Download with:">
+<!ENTITY tool.firefox "Firefox">
+<!ENTITY tool.dta "DownThemAll!">
 
 <!ENTITY option.all.label "Select All">
 <!ENTITY option.all.tooltip "Select all files">

@@ -8,6 +8,10 @@
 <!ENTITY output.label "下载到：">
 <!ENTITY output.tooltip "浏览目标文件夹...">
 
+<!ENTITY tool.label "下载工具：">
+<!ENTITY tool.firefox "系统">
+<!ENTITY tool.dta "DownThemAll!">
+
 <!ENTITY option.all.label "选择全部">
 <!ENTITY option.all.tooltip "下载所有文件">
 <!ENTITY option.hide-incomplete.label "隐藏未完成的文件">

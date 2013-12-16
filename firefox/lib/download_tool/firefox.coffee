@@ -104,6 +104,15 @@ download_multiple_tasks_review = (tasks) ->
 			select_folder win, menulist.value, (file) ->
 				menulist.value = file.path
 
+		dta = require('download_tools').dta
+		doc.getElementById('tool-firefox').disabled = true
+		if dta?
+			doc.getElementById('tool').value = 'dta'
+		else
+			doc.getElementById('tool-dta').disabled = true
+			doc.getElementById('tool').value = 'dta'
+			doc.getElementById('tool').disabled = true
+
 		win.onsave = (tasks) ->
 			folder = menulist.value
 			if require('sdk/io/file').exists folder
