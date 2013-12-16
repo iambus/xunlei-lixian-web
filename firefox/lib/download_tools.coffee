@@ -5,7 +5,7 @@ dta = require('download_tool/dta')
 flashgot = require('download_tool/flashgot')
 xthunder = require('download_tool/xthunder')
 
-{prefs} = require("sdk/simple-prefs")
+simple_prefs = require("sdk/simple-prefs")
 
 tools =
 	firefox: firefox
@@ -14,9 +14,14 @@ tools =
 	xthunder: xthunder
 
 get_download_tool = ->
-	tool = tools[prefs.download_tool] ? firefox
+	tool = tools[simple_prefs.prefs.download_tool] ? firefox
 	return tool.download_tasks
 
+simple_prefs.on 'download_tool', ->
+	if not tools[simple_prefs.prefs.download_tool]
+		require('notify').error require('sdk/l10n').get "download_tool_#{simple_prefs.prefs.download_tool}_error_not_found"
+	else
+		require('notify') require('sdk/l10n').get "download_tool_changed"
 
 module.exports =
 	firefox: firefox

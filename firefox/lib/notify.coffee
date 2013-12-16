@@ -74,6 +74,18 @@ notify = (message) ->
 		message = message: message
 	notify_in_status_bar message
 
+notify.info = (message) ->
+	notify type: 'info', message: message
+
+notify.success = (message) ->
+	notify type: 'success', message: message
+
+notify.warning = (message) ->
+	notify type: 'warning', message: message
+
+notify.error = (message) ->
+	notify type: 'error', message: message
+
 
 require("sdk/system/unload").when ->
 	for w in window_utils.windows()

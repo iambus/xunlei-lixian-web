@@ -8,7 +8,7 @@ class CachedList
 		@tasks = []
 		@done = false
 	fetch: (page_index, callback) ->
-		logging 'listing_tasks', page_index
+		logging 'listing_tasks', page_index + 1
 		@client.list_tasks_by_page page_index, callback
 	search_array: (url, tasks) ->
 		for t in tasks
