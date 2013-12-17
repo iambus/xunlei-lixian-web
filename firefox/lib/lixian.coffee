@@ -522,7 +522,7 @@ class XunleiClient
 					for file in files
 						file.dirs.unshift task.name
 #						file.dirname = file.dirs.join '/'
-						file.full_path = task.name + '/' + task.full_path
+						file.full_path = task.name + '/' + file.full_path
 			callback result
 
 ################################################################################
