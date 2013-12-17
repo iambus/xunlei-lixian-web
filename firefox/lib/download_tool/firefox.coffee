@@ -67,8 +67,26 @@ select_folder = (win, default_dir, callback) ->
 
 download_tasks_via_firefox = (tasks, folder) ->
 	io_file = require('sdk/io/file')
+	unique_path = (path) ->
+		if not io_file.exists path
+			return path
+		dir = io_file.dirname path
+		filename = io_file.basename path
+		m = filename.match(/^(.*)(\.[^.]+)$/)
+		if m?
+			name = m[1]
+			ext = m[2]
+		else
+			name = filename
+			ext = ''
+		for i in [1..65535]
+			new_path = io_file.join(dir, "#{name} (#{i})#{ext}")
+			if not io_file.exists new_path
+				return new_path
+		throw new Error("Can't find a unique path for #{path}")
 	download1 = (url, path) ->
 		# TODO: escape invalid filenames
+		path = unique_path path
 		dir = io_file.dirname path
 		io_file.mkpath dir
 		web_browser_persist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Ci.nsIWebBrowserPersist)
