@@ -33,7 +33,7 @@
         <vbox autostretch="never">
             <caption label="&tool.label;"/>
             <hbox>
-                <menulist id='tool' label="&tool.dta;" flex="1">
+                <menulist id='tool' label="&tool.dta;" flex="1" width="110">
                     <menupopup>
                         <menuitem id="tool-firefox" label='&tool.firefox;' value='firefox'/>
                         <menuitem id="tool-dta" label='&tool.dta;' value='dta'/>
