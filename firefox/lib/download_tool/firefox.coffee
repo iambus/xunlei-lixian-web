@@ -82,6 +82,7 @@ download_tasks_via_firefox = (tasks, folder) ->
 		for i in [1..65535]
 			new_path = io_file.join(dir, "#{name} (#{i})#{ext}")
 			if not io_file.exists new_path
+				require('notify') type: 'warning', message: _('download_tool_firefox_warning_renamed', path, new_path)
 				return new_path
 		throw new Error("Can't find a unique path for #{path}")
 	download1 = (url, path) ->
