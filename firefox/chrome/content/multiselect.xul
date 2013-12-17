@@ -44,5 +44,6 @@
     </hbox>
     <checkbox id="check-all" checked="true" label="&option.all.label;" tooltiptext="&option.all.tooltip;"/>
     <checkbox id="hide-incomplete" checked="false" label="&option.hide-incomplete.label;" tooltiptext="&option.hide-incomplete.tooltip;"/>
+    <checkbox id="hide-dir" checked="false" label="&option.hide-dir.label;" tooltiptext="&option.hide-dir.tooltip;"/>
     <script type="application/javascript" src="multiselect.js"/>
 </dialog>

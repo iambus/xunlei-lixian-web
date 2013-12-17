@@ -16,4 +16,6 @@
 <!ENTITY option.all.tooltip "下载所有文件">
 <!ENTITY option.hide-incomplete.label "隐藏未完成的文件">
 <!ENTITY option.hide-incomplete.tooltip "隐藏未完成的文件">
+<!ENTITY option.hide-dir.label "不显示目录名">
+<!ENTITY option.hide-dir.tooltip "不显示目录名（但目录依然会被创建）">
 

@@ -16,6 +16,11 @@ document.getElementById('hide-incomplete').addEventListener 'command', ->
 	for treerow in document.querySelectorAll "#files treechildren treerow:not([status='completed'])"
 		treerow.parentNode.hidden = @checked
 
+document.getElementById('hide-dir').addEventListener 'command', ->
+	for cell in document.querySelectorAll "#files treechildren treecell.path"
+		label = if @checked then cell.getAttribute('filename') else cell.getAttribute('path')
+		cell.setAttribute 'label', label
+
 window.load = (tasks) ->
 	all_tasks = tasks
 
@@ -45,6 +50,9 @@ window.load = (tasks) ->
 		file = document.createElement('treecell')
 		file.setAttribute 'label', t.full_path
 		file.setAttribute 'editable', false
+		file.setAttribute 'filename', t.filename
+		file.setAttribute 'path', t.full_path
+		file.setAttribute 'class', 'path'
 		set_properties file,
 			disabled: t.status_text != 'completed'
 
