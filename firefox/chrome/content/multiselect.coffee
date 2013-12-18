@@ -1,65 +1,92 @@
 
 all_tasks = []
+completed_tasks = []
+hide_incomplete = false
+hide_dir = false
 
-set_properties = (node, properties) ->
-	keys = []
-	for k, v of properties
-		if v
-			keys.push k
-	node.setAttribute 'properties', keys.join('')
+
+tree = document.getElementById 'files'
+
+redraw = ->
+	box = tree.boxObject
+	box.QueryInterface(Components.interfaces.nsITreeBoxObject)
+	box.invalidate()
 
 document.getElementById('check-all').addEventListener 'command', ->
-	for checkbox in document.querySelectorAll "#files treechildren treerow[status='completed'] treecell.checkbox"
-		checkbox.setAttribute 'value', @checked
+	for t in all_tasks
+		if t.status_text == 'completed'
+			t.checked = @checked
+	redraw()
 
 document.getElementById('hide-incomplete').addEventListener 'command', ->
-	for treerow in document.querySelectorAll "#files treechildren treerow:not([status='completed'])"
-		treerow.parentNode.hidden = @checked
+	hide_incomplete = @checked
+	if hide_incomplete
+		tasks = completed_tasks
+	else
+		tasks = all_tasks
+	tree.view = new TreeView tasks
+	redraw()
 
 document.getElementById('hide-dir').addEventListener 'command', ->
-	for cell in document.querySelectorAll "#files treechildren treecell.path"
-		label = if @checked then cell.getAttribute('filename') else cell.getAttribute('path')
-		cell.setAttribute 'label', label
+	hide_dir = @checked
+	redraw()
+
+class TreeView
+	constructor: (@tasks) ->
+		@reset()
+	reset: ->
+		@rowCount = @tasks.length
+	getCellText: (row, column) ->
+		task = @tasks[row]
+		if column.index == 1
+			if hide_dir
+				return task.filename
+			else
+				return task.full_path
+		else
+			return ''
+	getCellValue: (row, column) ->
+		if column.index == 0
+			task = @tasks[row]
+			return task.checked ? task.status_text == 'completed'
+	setCellValue: (row, column, value) ->
+		if column.index == 0
+			task = @tasks[row]
+			task.checked = value == 'true'
+	isEditable: (row, column) ->
+		column.index == 0 and @tasks[row].status_text == 'completed'
+	getRowProperties: (row) ->
+		properties = []
+		task = @tasks[row]
+		if task.checked ? task.status_text == 'completed'
+			properties.push 'checked'
+		if hide_incomplete and task.status_text != 'completed'
+			properties.push 'hidden'
+		return properties.join ''
+	getCellProperties: (row ,column, props) ->
+		task = @tasks[row]
+		if task.status_text != 'completed'
+			return 'disabled'
+	getColumnProperties: (colid, column, props) ->
+	cycleHeader: (column) ->
+	isSorted: ->
+		return false
+	setTree: (treebox) ->
+		@treebox = treebox
+	isContainer: (row) ->
+		return false
+	isSeparator: (row) ->
+		return false
+	getLevel: (row) ->
+		return 0
+	getImageSrc: (row, column) ->
+		return null
 
 window.load = (tasks) ->
 	all_tasks = tasks
+	completed_tasks = (t for t in tasks when t.status_text == 'completed')
 
-	treechildren = document.querySelector '#files treechildren'
-	for t, i in all_tasks
-		treeitem = document.createElement('treeitem')
-
-
-		treerow = document.createElement('treerow')
-		treerow.setAttribute 'status', t.status_text
-		treerow.setAttribute 'task_index', i
-		set_properties treerow,
-#			checked: t.status_text == 'completed'
-			disabled: t.status_text != 'completed'
-
-		checkbox = document.createElement('treecell')
-		checkbox.setAttribute 'value', t.status_text == 'completed'
-		checkbox.setAttribute 'editable', t.status_text == 'completed'
-		checkbox.setAttribute 'class', 'checkbox'
-		set_properties checkbox,
-			disabled: t.status_text != 'completed'
-		checkbox.onclick = ->
-			console.log @
-		checkbox.addEventListener 'click', ->
-			console.log @getAttribute('checked')
-
-		file = document.createElement('treecell')
-		file.setAttribute 'label', t.full_path
-		file.setAttribute 'editable', false
-		file.setAttribute 'filename', t.filename
-		file.setAttribute 'path', t.full_path
-		file.setAttribute 'class', 'path'
-		set_properties file,
-			disabled: t.status_text != 'completed'
-
-		treerow.appendChild checkbox
-		treerow.appendChild file
-		treeitem.appendChild treerow
-		treechildren.appendChild treeitem
+	tree.view = new TreeView tasks
 
 window.onsave = ->
 
@@ -67,12 +94,9 @@ window.oncancel = ->
 
 window.save = ->
 	tasks = []
-	for treerow in document.querySelectorAll('#files treechildren treerow')
-		if treerow.getElementsByTagName('treecell')[0].getAttribute('value') == 'true'
-			index = parseInt treerow.getAttribute 'task_index'
-			task = all_tasks[index]
-			if task?
-				tasks.push task
+	for t in all_tasks
+		if t.checked ? t.status_text == 'completed'
+			tasks.push t
 	window.onsave tasks
 
 window.cancel = ->
