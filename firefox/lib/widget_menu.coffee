@@ -9,13 +9,15 @@ full_widget_id = (widget_id) ->
 full_menu_id = (widget_id) ->
 	"menu:#{require('sdk/self').id}-#{widget_id}"
 
-create_simple_menu_item = (doc, {label, id, type, command}) ->
+create_simple_menu_item = (doc, {label, id, type, tooltip, command}) ->
 	menuitem = doc.createElementNS(NS_XUL, 'menuitem')
 	menuitem.setAttribute 'label', label
 	if id?
 		menuitem.setAttribute 'id', full_menu_id id
 	if type?
 		menuitem.setAttribute 'type', type
+	if tooltip?
+		menuitem.setAttribute 'tooltiptext', tooltip
 	if command?
 		menuitem.addEventListener 'command', command
 	return menuitem

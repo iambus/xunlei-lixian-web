@@ -91,10 +91,19 @@ widget.port.on 'right-click', ->
 		command: ->
 			prefs.associate_types = @getAttribute('checked') == 'true'
 	,
+		id: 'clear_user_info'
+		label: _('widget_menu_clear_user_info')
+		tooltip: _('widget_menu_clear_user_info_label')
+		command: ->
+			delete storage.username
+			delete storage.password
+			delete storage.save
+	,
 		label: _('widget_menu_web_site')
 		command: -> tabs.open("http://lixian.vip.xunlei.com/task.html")
 	,
 		label: _('widget_menu_project_site')
+		tooltip: _('widget_menu_project_site_label')
 		command: -> tabs.open("https://github.com/iambus/xunlei-lixian-web")
 	]
 	menu_download_tool_firefox = menu.find 'download_tool_firefox'
