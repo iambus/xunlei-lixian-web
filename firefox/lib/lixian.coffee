@@ -148,10 +148,8 @@ class XunleiClient
 
 	upload: (url, form, callback) -> # support auto-relogin relavant url
 		url = @url url
-		if not @id # TODO: check login properly
-			@auto_login (result) =>
-				@http_upload url, form, callback
-		else
+		@login_check =>
+			# TODO: check response for session timeout
 			@http_upload url, form, callback
 
 	init: (callback) ->
@@ -172,9 +170,6 @@ class XunleiClient
 	get_id_from_cookie: ->
 		@get_cookie('xunlei.com', 'userid')
 
-	init_id_from_cookie: ->
-		@id = @get_id_from_cookie()
-
 	login_with_verification_code: (username, password, verification_code, callback) ->
 		@last_username = username
 		@last_login_time = new Date
@@ -187,11 +182,9 @@ class XunleiClient
 			p: password
 			verifycode: verification_code
 		@http_post login_url, form, ({text}) =>
-			user_id = @get_cookie('xunlei.com', 'userid')
-			if not user_id
+			if not @get_id_from_cookie()
 				callback? ok: false
 			else
-				@id = user_id
 				callback? ok: true
 
 	login_without_retry: (username, password, callback) ->
@@ -252,19 +245,8 @@ class XunleiClient
 						reason: "Can't parse response"
 						response: text
 
-	login_check: (callback) ->
-		if @get_cookie('.xunlei.com', 'sessionid')
-			throw new Error("Not Implemented: login_check")
-		else if @get_cookie '.xunlei.com', 'lsessionid'
-			@login_enrich_cookie (result) =>
-				if result.ok
-					callback result
-				else
-					callback ok: false
-		else
-			callback ok: false, reason: 'No session found'
-
 	auto_login: (callback) ->
+		console.log "session timedout. trying to relogin..."
 		if @username and @password
 			@login @username, @password, (result) =>
 				if result.ok
@@ -292,6 +274,61 @@ class XunleiClient
 					@password = password
 					@auto_login callback
 
+
+	login_check: (callback) ->
+#		if @get_cookie('.xunlei.com', 'sessionid')
+#			throw new Error("Not Implemented: login_check")
+#		else if @get_cookie '.xunlei.com', 'lsessionid'
+#			@login_enrich_cookie (result) =>
+#				if result.ok
+#					callback result
+#				else
+#					callback ok: false
+#		else
+#			callback ok: false, reason: 'No session found'
+		if not (@get_cookie('xunlei.com', 'userid') and @get_cookie('.xunlei.com', 'sessionid'))
+			@login_enrich_cookie (result) =>
+				if result.ok
+					callback result
+				else
+					if @auto_relogin
+						@auto_login (result) =>
+							callback result
+					else
+						callback ok: false, reason: 'auto-relogin is disabled'
+		else
+			callback ok: true
+
+	# TODO:
+	auto_relogin_for: ({url, form, pattern, callback}) ->
+		if form?
+			request = (callback) => @post url, form, callback
+		else
+			request = (callback) => @get url, callback
+		if Object.prototype.toString.call(pattern) == '[object RegExp]'
+			is_timeout = (text) -> pattern.match text
+		else
+			is_timeout = (text) -> text == pattern
+		relogin = =>
+			@auto_login (result) =>
+				if result.ok
+					request (result) =>
+						callback result
+				else
+					callback result
+		start = =>
+			request (result) =>
+				{text} = result
+				if is_timeout(text) and @auto_relogin
+					relogin()
+				else
+					callback result
+		@login_check =>
+			start()
+
+	with_id: (callback) ->
+		@login_check =>
+			callback @get_id_from_cookie()
 
 	#######
 	# add #
@@ -330,21 +367,22 @@ class XunleiClient
 
 
 	commit_bt_task: ({info_hash, name, size, files}, callback) ->
-		form =
-			uid: @id
-			btname: name
-			cid: info_hash
-			tsize: size
-			findex: (f['id']+'_' for f in files).join('')
-			size: (f['size']+'_' for f in files).join('')
-			from: '0'
-		jsonp = "jsonp#{current_timestamp()}"
-		commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
-		@post commit_url, form, ({text}) ->
-			if text.match "^#{jsonp}\(.*\)"
-				callback ok: true, reason: 'BT task created', info_hash: info_hash
-			else
-				callback ok: false, reason: 'Failed be parse bt result', response: text
+		@with_id (id) =>
+			form =
+				uid: id
+				btname: name
+				cid: info_hash
+				tsize: size
+				findex: (f['id']+'_' for f in files).join('')
+				size: (f['size']+'_' for f in files).join('')
+				from: '0'
+			jsonp = "jsonp#{current_timestamp()}"
+			commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
+			@post commit_url, form, ({text}) ->
+				if text.match "^#{jsonp}\(.*\)"
+					callback ok: true, reason: 'BT task created', info_hash: info_hash
+				else
+					callback ok: false, reason: 'Failed be parse bt result', response: text
 
 	add_bt_task_by_blob: (blob, callback) ->
 		@upload_torrent_file_by_blob blob, (result) =>
@@ -356,7 +394,7 @@ class XunleiClient
 	query_bt_task_by_url: (url, callback) ->
 		url = "/interface/url_query?callback=queryUrl&u=#{encodeURIComponent url}&random=#{current_timestamp()}"
 		@get url, ({text}) =>
-			m = text.match /^queryUrl(\(1,.*\))\s*$/
+			m = text.match /^queryUrl(\(1,.*\))\s*$/ # XXX: sometimes it returns queryUrl(0,...)?
 			if m
 				[_, cid, tsize, btname, _, names, sizes_, sizes, _, types, findexes, timestamp, _] = @parse_queryUrl text
 				callback
@@ -382,24 +420,14 @@ class XunleiClient
 
 	add_bt_task_by_info_hash: (hash, callback) ->
 		hash = hash.toUpperCase()
-		# TODO: check session and @id
-		if @id
-			url = "http://dynamic.cloud.vip.xunlei.com/interface/get_torrent?userid=#{@id}&infoid=#{hash}"
+		@with_id (id) =>
+			url = "http://dynamic.cloud.vip.xunlei.com/interface/get_torrent?userid=#{id}&infoid=#{hash}"
 			@add_bt_task_by_query_url url, callback
-		else
-			# TODO: ineffient, should try login_enrich_cookie
-			@auto_login =>
-				url = "http://dynamic.cloud.vip.xunlei.com/interface/get_torrent?userid=#{@id}&infoid=#{hash}"
-				@add_bt_task_by_query_url url, callback
 
 	add_magnet_task: (url, callback) ->
-		# TODO: check session and @id
-#		@add_bt_task_by_query_url url, callback
-		if @id
+		@login_check =>
+			# TODO: check response for session timeout
 			@add_bt_task_by_query_url url, callback
-		else
-			@auto_login =>
-				@add_bt_task_by_query_url url, callback
 
 	add_task: (url, callback) ->
 		throw new Error("Not Implemented: add_task")
@@ -417,22 +445,19 @@ class XunleiClient
 		jsonp = "jsonp#{current_timestamp()}"
 		url = "/interface/batch_task_commit?callback=#{jsonp}"
 #		@post url, form, callback
-		@post url, form, ({text}) =>
-			if text == '''<script>document.cookie ="sessionid=; path=/; domain=xunlei.com"; document.cookie ="lx_sessionid=; path=/; domain=vip.xunlei.com";top.location='http://lixian.vip.xunlei.com/task.html?error=1'</script>'''	and @auto_relogin
-				@auto_login (result) =>
-					if result.ok
-						@post url, form, ({text}) =>
-							if text.match "#{jsonp}\\(#{urls.length}\\)"
-								callback ok: true
-							else
-								callback ok: false, reason: "jsonp", response: text
+		@auto_relogin_for
+			url: url
+			form: form
+			pattern: '''<script>document.cookie ="sessionid=; path=/; domain=xunlei.com"; document.cookie ="lx_sessionid=; path=/; domain=vip.xunlei.com";top.location='http://lixian.vip.xunlei.com/task.html?error=1'</script>'''
+			callback: (result) =>
+				if result.ok
+					text = result.text
+					if text.match "#{jsonp}\\(#{urls.length}\\)"
+						callback ok: true
 					else
-						callback result
-			else
-				if text.match "#{jsonp}\\(#{urls.length}\\)"
-					callback ok: true
+						callback ok: false, reason: "jsonp", response: text
 				else
-					callback ok: false, reason: "jsonp", response: text
+					callback result
 
 	########
 	# list #
@@ -469,21 +494,16 @@ class XunleiClient
 			reason: "Can't parse response"
 			response: text
 
-	# TODO:
-	auto_relogin_for: (url, timeout_patten, callback) ->
-
 	list_tasks_by: (type_id, page_index, page_size, callback) ->
 		url = @to_page_url type_id, page_index, page_size
-		@get url, ({text}) =>
-			if text == 'rebuild({"rtcode":-1,"list":[]})' and @auto_relogin
-				@auto_login (result) =>
-					if result.ok
-						@get url, ({text}) =>
-							callback @parse_rebuild text
-					else
-						callback result
-			else
-				callback @parse_rebuild text
+		@auto_relogin_for
+			url: url
+			pattern: 'rebuild({"rtcode":-1,"list":[]})'
+			callback: (result) =>
+				if result.ok
+					callback @parse_rebuild result.text
+				else
+					callback result
 
 	list_tasks_by_page: (page_index, callback) ->
 		@list_tasks_by 4, page_index, @page_size, callback
@@ -511,19 +531,19 @@ class XunleiClient
 			callback ok: false, reason: 'Not a bt task'
 			return
 
-		# XXX: check timeout and @id?
-		url = "/interface/fill_bt_list?callback=fill_bt_list&tid=#{task.id}&infoid=#{task.bt_hash}&g_net=1&p=1&uid=#{@id}&noCacheIE=#{current_timestamp()}"
-		@set_page_size_in_cokie 9999
-		@get url, ({text}) =>
-			result = @parse_fill_bt_list text
-			{ok, files} = result
-			if ok
-				unless files.length == 1 and files[0].name == task.name
-					for file in files
-						file.dirs.unshift task.name
-#						file.dirname = file.dirs.join '/'
-						file.full_path = task.name + '/' + file.full_path
-			callback result
+		@with_id (id) =>
+			url = "/interface/fill_bt_list?callback=fill_bt_list&tid=#{task.id}&infoid=#{task.bt_hash}&g_net=1&p=1&uid=#{id}&noCacheIE=#{current_timestamp()}"
+			@set_page_size_in_cokie 9999
+			@get url, ({text}) =>
+				result = @parse_fill_bt_list text
+				{ok, files} = result
+				if ok
+					unless files.length == 1 and files[0].name == task.name
+						for file in files
+							file.dirs.unshift task.name
+#							file.dirname = file.dirs.join '/'
+							file.full_path = task.name + '/' + file.full_path
+				callback result
 
 ################################################################################
 # export
