@@ -18,6 +18,12 @@ login_panel = Panel
 	contentURL: self.data.url('content/login.html')
 	contentScriptFile: self.data.url('content/login.js')
 
+task_panel = Panel
+	width: 200
+	height: 240
+	contentURL: self.data.url('content/task.html')
+	contentScriptFile: self.data.url('content/task.js')
+
 login_panel.port.on 'login', ({username, password, save, verification_code}) ->
 	if password
 		password = encypt_password password
@@ -51,11 +57,47 @@ widget = Widget
 	contentURL: self.data.url('xunlei.ico')
 	contentScriptWhen: 'ready',
 	contentScriptFile: self.data.url('content/widget.js')
-#	panel: login_panel
-#	onClick: (view) ->
+	panel: task_panel
+	onClick: (view) ->
 #		tabs.open("http://lixian.vip.xunlei.com/task.html")
-widget.port.on 'left-click', ->
-	tabs.open("http://lixian.vip.xunlei.com/task.html")
+		task_panel.port.emit 'show'
+
+task_panel.port.on 'refresh', (page_index) ->
+	client.list_tasks_by 4, page_index, 10, (result) ->
+		if result.ok
+			task_panel.port.emit 'tasks', result
+		else
+			notify type: 'error', message:  _('list_error', result.reason)
+			console.log result.response
+
+task_panel.port.on 'resize', ({width, height}) ->
+	if not width?
+		width = task_panel.width
+	if not height?
+		height = task_panel.height
+	task_panel.resize width, height
+
+task_panel.port.on 'download', (task) ->
+	if task.type != 'bt'
+		download_with ok: true, tasks: [task]
+	else
+		client.list_bt task, (result) ->
+			if result.ok
+				download_with ok: true, tasks: result.files
+			else
+				download_with result
+
+task_panel.port.on 'delete', (id) ->
+	client.delete_task_by_id id, (result) ->
+		if result.ok
+			notify type: 'success', message:  _('delete_ok')
+			task_panel.port.emit 'refresh'
+		else
+			notify type: 'error', message:  _('delete_error', result.reason)
+			console.log result.response
+
+#widget.port.on 'left-click', ->
+#	tabs.open("http://lixian.vip.xunlei.com/task.html")
 widget.port.on 'right-click', ->
 	menu = widget_menu widget_id, 'options', [
 		label: _('widget_menu_download_tool')
@@ -132,6 +174,8 @@ download_tools = require('download_tools')
 download_with = ({ok, tasks, finished, skipped, reason, response}) ->
 	download_tool = download_tools.get() # TODO: check download tool before requests
 	if ok
+		finished = finished ? (t for t in tasks when t.status_text == 'completed')
+		skipped = skipped ? (t for t in tasks when t.status_text != 'completed')
 		if finished.length > 0
 			notify type: 'success', message: _('download_status_done')
 			download_tool tasks

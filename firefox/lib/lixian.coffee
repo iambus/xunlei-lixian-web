@@ -16,7 +16,7 @@ current_timestamp = ->
 
 
 no_cache = (url) ->
-	if url.indexOf '?' == -1
+	if url.indexOf('?') == -1
 		url += '?'
 	else
 		url += '&'
@@ -189,7 +189,7 @@ class XunleiClient
 
 	login_without_retry: (username, password, callback) ->
 		cachetime = current_timestamp()
-		check_url = "http://login.xunlei.com/check?u=#{username}&cachetime=#{cachetime}"
+		check_url = no_cache "http://login.xunlei.com/check?u=#{username}"
 		@http_get check_url, ({text}) =>
 			verification_code = @get_cookie('check_result')?.substr(2)
 			if verification_code
@@ -198,7 +198,7 @@ class XunleiClient
 				callback
 					ok: false
 					reason: "Verification code required"
-					verification_code: "http://verify2.xunlei.com/image?cachetime=#{current_timestamp()}"
+					verification_code: no_cache "http://verify2.xunlei.com/image"
 
 	login_with_retry: (username, password, callback, retries=30) ->
 		@login_without_retry username, password, (result) =>
@@ -219,7 +219,7 @@ class XunleiClient
 
 	login_enrich_cookie: (callback) ->
 		cachetime = current_timestamp()
-		check_url = "http://dynamic.cloud.vip.xunlei.com/interface/verify_login&noCacheIE=#{cachetime}"
+		check_url = no_cache "http://dynamic.cloud.vip.xunlei.com/interface/verify_login"
 		@http_get check_url, ({text}) =>
 			if text == '({"result":0})'
 				callback
@@ -532,7 +532,7 @@ class XunleiClient
 			return
 
 		@with_id (id) =>
-			url = "/interface/fill_bt_list?callback=fill_bt_list&tid=#{task.id}&infoid=#{task.bt_hash}&g_net=1&p=1&uid=#{id}&noCacheIE=#{current_timestamp()}"
+			url = no_cache "/interface/fill_bt_list?callback=fill_bt_list&tid=#{task.id}&infoid=#{task.bt_hash}&g_net=1&p=1&uid=#{id}"
 			@set_page_size_in_cokie 9999
 			@get url, ({text}) =>
 				result = @parse_fill_bt_list text
@@ -544,6 +544,31 @@ class XunleiClient
 #							file.dirname = file.dirs.join '/'
 							file.full_path = task.name + '/' + file.full_path
 				callback result
+
+	##########
+	# delete #
+	##########
+
+	delete_tasks_by_id: (ids, callback) ->
+		jsonp = "jsonp#{current_timestamp()}"
+		form =
+			taskids: ids.join(',')+','
+			databases: '0,'
+		url = no_cache "/interface/task_delete?callback=#{jsonp}&type=2" # XXX: what is 'type'?
+		@post url, form, (result) ->
+			if result.ok
+				if result.text == """#{jsonp}({"result":1,"type":2})"""
+					callback ok: true
+				else
+					callback
+						ok: false
+						reason: "Can't parse response"
+						response: result.text
+			else
+				callback result
+
+	delete_task_by_id: (id, callback) ->
+		@delete_tasks_by_id [id], callback
 
 ################################################################################
 # export

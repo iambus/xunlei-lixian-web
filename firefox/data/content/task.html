@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css" media="all">
+        body {
+            -moz-user-select: none;
+            font-size: 12px;
+            font-family: 'microsoft yahei';
+        }
+
+        .refresh {
+            width: 16px;
+            height: 16px;
+            background-image: url("chrome://browser/skin/reload-stop-go.png");
+            background-position: 0px 0px;
+            display: inline-block;
+            float: right;
+        }
+        .refresh:hover {
+            background-position: 0px -14px;
+        }
+
+        #tasks {
+            overflow: hidden;
+        }
+        #tasks .task {
+            width: 100%;
+            position: relative;
+            border-top: 1px dotted gray;
+        }
+        #tasks .task[status='completed'] {
+            background-color: lightgreen;
+        }
+        .task-name {
+            /*-moz-user-select: text;*/
+            white-space: nowrap;
+            max-width: 600px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        #tasks .task:last-child {
+            border-bottom: 1px dotted gray;
+        }
+        #tasks .buttons {
+            display: none;
+            right: 8px;
+            position: absolute;
+        }
+        #tasks .task:hover .buttons {
+            display: inline-block;
+        }
+        #tasks .buttons > * {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .download {
+            display: none;
+            background-image: url("chrome://global/skin/icons/find.png");
+            background-position: 0px -32px;
+        }
+        .download:hover {
+            background-position: 0px 0px;
+        }
+        .task[status='completed'] .download {
+            display: inline-block;
+        }
+        .delete {
+            display: inline-block;
+            background-image: url("chrome://browser/skin/reload-stop-go.png");
+            background-position: -16px 0px;
+        }
+        .delete:hover {
+            background-position: -16px -28px;
+        }
+
+        #pages {
+            display: inline-block;
+        }
+        #pages a {
+            border: 1px solid #39caff;
+            margin-right: 2px;
+            padding: 2px 3px;
+        }
+        #pages a.current {
+            background-color: lightblue;
+            font-weight: bold;
+        }
+        #pages a:hover {
+            background-color: lightblue;
+            cursor: pointer;
+        }
+        #pages a.disabled {
+            border: 1px dotted gray;
+            color: gray;
+        }
+
+        .footer {
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id='tasks'>
+    </div>
+    <div class='footer'>
+        <div id='pages'><a class='previous disabled'>«</a><a>1</a><a class='next disabled'>»</a></div>
+        <div class='refresh'></div>
+    </div>
+</body>
+</html>
