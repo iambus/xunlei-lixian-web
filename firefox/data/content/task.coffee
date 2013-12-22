@@ -129,6 +129,9 @@ resize = ->
 			width = t.offsetWidth
 	if width > 500
 		width = 500
+	footer_width = pages_element.offsetWidth + 24
+	if width < footer_width
+		width = footer_width
 	self.port.emit 'resize', width: width + 16
 
 self.port.on 'tasks', ({tasks, total}) ->

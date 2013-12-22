@@ -15,10 +15,7 @@
             height: 16px;
             background-image: url("chrome://browser/skin/reload-stop-go.png");
             background-position: 0px 0px;
-            display: inline-block;
             float: right;
-            position: fixed;
-            right: 8px;
             animation: spin 1s linear infinite;
             animation-play-state: paused;
         }
@@ -114,7 +111,8 @@
         }
 
         .footer {
-            position: absolute;
+            width: calc(100% - 16px);
+            position: fixed;
             bottom: 4px;
             margin-top: 4px;
             -moz-user-select: none;
