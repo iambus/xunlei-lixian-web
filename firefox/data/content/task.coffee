@@ -3,10 +3,12 @@ index = 0
 
 tasks_element = document.getElementById 'tasks'
 pages_element = document.getElementById 'pages'
+refresh_element = document.querySelector '.refresh'
 
 page_tasks = null
 
 refresh = ->
+	refresh_element.classList.add 'loading'
 	self.port.emit 'refresh', index
 
 document.querySelector('.refresh').onclick = ->
@@ -16,6 +18,7 @@ self.port.on 'show', ->
 	refresh()
 
 self.port.on 'tasks', ({tasks, total}) ->
+	refresh_element.classList.remove 'loading'
 	page_tasks = tasks
 	tasks_element.innerHTML = ''
 	for t, i in tasks

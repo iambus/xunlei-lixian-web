@@ -17,9 +17,19 @@
             background-position: 0px 0px;
             display: inline-block;
             float: right;
+            animation: spin 1s linear infinite;
+            animation-play-state: paused;
         }
         .refresh:hover {
             background-position: 0px -14px;
+        }
+        .refresh.loading {
+            animation-play-state: running;
+        }
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         #tasks {
