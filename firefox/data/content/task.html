@@ -15,7 +15,7 @@
             height: 16px;
             background-image: url("chrome://browser/skin/reload-stop-go.png");
             background-position: 0px 0px;
-            float: right;
+            float: left;
             animation: spin 1s linear infinite;
             animation-play-state: paused;
         }
@@ -87,6 +87,7 @@
 
         #pages {
             display: inline-block;
+            float: right;
         }
         #pages a {
             border: 1px solid #39caff;
@@ -123,8 +124,8 @@
     <div id='tasks'>
     </div>
     <div class='footer'>
-        <div id='pages'><a class='previous disabled'>«</a><a>1</a><a class='next disabled'>»</a></div>
         <div class='refresh'></div>
+        <div id='pages'><a class='previous disabled'>«</a><a>1</a><a class='next disabled'>»</a></div>
     </div>
 </body>
 </html>
