@@ -20,7 +20,7 @@ login_panel = Panel
 
 task_panel = Panel
 	width: 200
-	height: 240
+	height: 220
 	contentURL: self.data.url('content/task.html')
 	contentScriptFile: self.data.url('content/task.js')
 
