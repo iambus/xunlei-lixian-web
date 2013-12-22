@@ -17,9 +17,7 @@ document.querySelector('.refresh').onclick = ->
 self.port.on 'show', ->
 	refresh()
 
-self.port.on 'tasks', ({tasks, total}) ->
-	refresh_element.classList.remove 'loading'
-	page_tasks = tasks
+render_tasks = (tasks) ->
 	tasks_element.innerHTML = ''
 	for t, i in tasks
 		task = document.createElement 'div'
@@ -46,43 +44,78 @@ self.port.on 'tasks', ({tasks, total}) ->
 		task.appendChild buttons
 		tasks_element.appendChild task
 
-	pages = Math.floor total / 10
-	if pages % 10 != 1
-		pages += 1
-	if index >= pages or pages == 0
-		throw new Error("Not Implemented")
-	pages_element.innerHTML = ''
-	previous = document.createElement 'a'
-	previous.textContent = '«'
-	previous.classList.add 'previous'
-	if index <= 0
-		previous.classList.add 'disabled'
-	else
-		previous.onclick = ->
-			index--
-			refresh()
-	pages_element.appendChild previous
-	for i in [0...pages]
-		p = document.createElement 'a'
-		p.textContent = i + 1
-		if i == index
-			p.classList.add 'current'
-		p.setAttribute 'page', i
-		p.onclick = ->
-			index = parseInt @getAttribute('page')
-			refresh()
-		pages_element.appendChild p
-	next = document.createElement 'a'
-	next.textContent = '»'
-	next.classList.add 'next'
-	if index >= pages - 1
-		next.classList.add 'disabled'
-	else
-		next.onclick = ->
-			index++
-			refresh()
-	pages_element.appendChild next
+render_pages = (total) ->
+	show_pages = (eanble_previous, pages, enable_next) ->
+		pages_element.innerHTML = ''
 
+		previous = document.createElement 'a'
+		previous.textContent = '«'
+		previous.classList.add 'previous'
+		if eanble_previous
+			previous.onclick = ->
+				index--
+				refresh()
+		else
+			previous.classList.add 'disabled'
+		pages_element.appendChild previous
+
+		for i in pages
+			if i == '...'
+				ellipses = document.createElement 'span'
+				ellipses.textContent = '...'
+				pages_element.appendChild ellipses
+			else
+				p = document.createElement 'a'
+				p.textContent = i + 1
+				if i == index
+					p.classList.add 'current'
+				p.setAttribute 'page', i
+				p.onclick = ->
+					index = parseInt @getAttribute('page')
+					refresh()
+				pages_element.appendChild p
+
+		next = document.createElement 'a'
+		next.textContent = '»'
+		next.classList.add 'next'
+		if enable_next
+			next.onclick = ->
+				index++
+				refresh()
+		else
+			next.classList.add 'disabled'
+		pages_element.appendChild next
+
+	total_pages = Math.floor total / 10
+	if total_pages % 10 != 1
+		total_pages += 1
+	if index >= total_pages or total_pages == 0
+		throw new Error("Not Implemented")
+
+	if total_pages <= 11
+		show_pages 0 < index, [0...total_pages], index < total_pages - 1
+	else
+		start = index - 4
+		end = index + 4
+		if start <= 2
+			start = 0
+		if end >= total_pages - 3
+			end = total_pages - 1
+		if start == 0 and end < 8
+			end = 8
+		if end == total_pages - 1 and end - start < 8
+			start = end - 8
+		pages = [start..end]
+		if start > 0
+			pages.unshift '...'
+			pages.unshift 0
+		if end < total_pages - 1
+			pages.push '...'
+			pages.push total_pages - 1
+		show_pages 0 < index, pages, index < total_pages - 1
+
+
+resize = ->
 	width = 200
 	for t in tasks_element.querySelectorAll('.task .task-name')
 		if width < t.offsetWidth
@@ -90,6 +123,13 @@ self.port.on 'tasks', ({tasks, total}) ->
 	if width > 500
 		width = 500
 	self.port.emit 'resize', width: width + 16
+
+self.port.on 'tasks', ({tasks, total}) ->
+	refresh_element.classList.remove 'loading'
+	page_tasks = tasks
+	render_tasks tasks
+	render_pages total
+	resize()
 
 self.port.on 'refresh', ->
 	refresh()
