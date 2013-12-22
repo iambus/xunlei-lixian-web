@@ -45,13 +45,13 @@ render_tasks = (tasks) ->
 		tasks_element.appendChild task
 
 render_pages = (total) ->
-	show_pages = (eanble_previous, pages, enable_next) ->
+	show_pages = (enable_previous, pages, enable_next) ->
 		pages_element.innerHTML = ''
 
 		previous = document.createElement 'a'
 		previous.textContent = '«'
 		previous.classList.add 'previous'
-		if eanble_previous
+		if enable_previous
 			previous.onclick = ->
 				index--
 				refresh()
@@ -89,14 +89,21 @@ render_pages = (total) ->
 	total_pages = Math.floor total / 10
 	if total_pages % 10 != 1
 		total_pages += 1
-	if index >= total_pages or total_pages == 0
-		throw new Error("Not Implemented")
+
+	enable_previous = 0 < index
+	enable_next = index < total_pages - 1
+
+	if index < 0 or total_pages <= index
+		enable_previous = enable_next = false
+		current_page = 0
+	else
+		current_page = index
 
 	if total_pages <= 11
-		show_pages 0 < index, [0...total_pages], index < total_pages - 1
+		show_pages enable_previous, [0...total_pages], enable_next
 	else
-		start = index - 4
-		end = index + 4
+		start = current_page - 4
+		end = current_page + 4
 		if start <= 2
 			start = 0
 		if end >= total_pages - 3
@@ -112,7 +119,7 @@ render_pages = (total) ->
 		if end < total_pages - 1
 			pages.push '...'
 			pages.push total_pages - 1
-		show_pages 0 < index, pages, index < total_pages - 1
+		show_pages enable_previous, pages, enable_next
 
 
 resize = ->
