@@ -29,19 +29,16 @@ render_tasks = (tasks) ->
 		task_name.setAttribute 'class', 'task-name'
 		task_name.textContent = t.name
 		task.appendChild task_name
-		buttons = document.createElement 'div'
-		buttons.setAttribute 'class', 'buttons'
 		download = document.createElement 'div'
 		download.setAttribute 'class', 'download'
 		download.onclick = ->
 			self.port.emit 'download', page_tasks[@parentNode.parentNode.getAttribute 'task-index']
-		buttons.appendChild download
+		task.appendChild download
 		remove = document.createElement 'div'
 		remove.setAttribute 'class', 'delete'
 		remove.onclick = ->
 			self.port.emit 'delete', parseInt @parentNode.parentNode.getAttribute 'task-id'
-		buttons.appendChild remove
-		task.appendChild buttons
+		task.appendChild remove
 		tasks_element.appendChild task
 
 render_pages = (total) ->
