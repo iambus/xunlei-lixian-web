@@ -71,7 +71,7 @@ class TaskFile
 		@id = @taskid
 		@name = @title.replace /(&amp;)+/g, '&'
 		@filename = @name.replace /^.*\\/, ''
-		@dirs = @name.match(/^.*\\/)?[0].split('\\') ? []
+		@dirs = @name.match(/^(.*)\\/)?[1].split('\\') ? []
 		@full_path = @dirs.concat([@filename]).join('/')
 		@original_url = @url
 		@download_url = @downurl
