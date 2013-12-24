@@ -1,4 +1,40 @@
 
+base32_decode = (s) ->
+	a = []
+	bits = 0
+	v = 0
+	s = s.toUpperCase()
+	for i in [0...s.length]
+		c = s.charCodeAt i
+		if 65 <= c <= 90
+			c -= 65
+		else if 50 <= c <= 55
+			c = c - 50 + 26
+		else
+			throw new Error("Incorrect base32 letter: #{s[i]}")
+		if bits < 3
+			bits += 5
+			v = (v << 5) | c
+		else if bits == 3
+			a.push ((v << 5) | c)
+			bits = 0
+			v = 0
+		else
+			a.push (v << (8 - bits)) | (c >> (bits - 3))
+			bits = bits - 3
+			v = c & ((1 << bits) - 1)
+	new Uint8Array a
+
+
+hex_char_code = (code) ->
+	('0' + code.toString(16)).slice(-2)
+
+array_to_hex = (a) ->
+	(hex_char_code(a[i]) for i in [0...a.length]).join ''
+
+base32_to_hex = (s) ->
+	array_to_hex base32_decode s
+
 is_ed2k = (url) ->
 	url.match /^ed2k:\/\//
 
@@ -34,13 +70,25 @@ parse_ed2k_url_hash_hex = (url) ->
 	url.match(ed2k_re)?[2].toLowerCase()
 
 magnet_to_infohash = (url) ->
-	throw new Error("Not Implemented")
+	url = url.replace /&.*$/, ''
+	info_hash = url.match(/^magnet:\?xt=urn:btih:(.+)/)?[1]
+	if not info_hash?
+		return
+	if info_hash.match /^[a-fA-F0-9]{40}$/
+		return info_hash.toLowerCase()
+	else if info_hash.match /^[A-Z2-7]{32}$/
+		return base32_to_hex info_hash
+	else
+		return
 
 normalize_url = (url) ->
 	url = url_unmask(url)
 	if url.match /magnet:/
-#		throw new Error("Not Implemented")
-		return url
+		hash = magnet_to_infohash url
+		if hash
+			return "bt://#{hash}"
+		else
+			return url
 	else if url.match /^ed2k:\/\//
 		hash = parse_ed2k_url_hash_hex url
 		if not hash
