@@ -32,12 +32,12 @@ render_tasks = (tasks) ->
 		download = document.createElement 'div'
 		download.setAttribute 'class', 'download'
 		download.onclick = ->
-			self.port.emit 'download', page_tasks[@parentNode.parentNode.getAttribute 'task-index']
+			self.port.emit 'download', page_tasks[@parentNode.getAttribute 'task-index']
 		task.appendChild download
 		remove = document.createElement 'div'
 		remove.setAttribute 'class', 'delete'
 		remove.onclick = ->
-			self.port.emit 'delete', parseInt @parentNode.parentNode.getAttribute 'task-id'
+			self.port.emit 'delete', parseInt @parentNode.getAttribute 'task-id'
 		task.appendChild remove
 		tasks_element.appendChild task
 
