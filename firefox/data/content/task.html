@@ -34,13 +34,20 @@
         #tasks {
             overflow: hidden;
         }
-        #tasks .task {
+        .task {
             width: 100%;
             position: relative;
             border-top: 1px dotted gray;
         }
-        #tasks .task[status='completed'] {
+        .task[status='completed'] {
             background-color: lightgreen;
+        }
+        .task[status='completed']:hover {
+            cursor: pointer;
+            background-color: palegreen;
+        }
+        .task:last-child {
+            border-bottom: 1px dotted gray;
         }
         .task-name {
             /*-moz-user-select: text;*/
@@ -49,31 +56,17 @@
             text-overflow: ellipsis;
             overflow: hidden;
         }
-        #tasks .task:last-child {
-            border-bottom: 1px dotted gray;
-        }
-        .download, .play, .delete {
+        .play, .delete {
             display: none;
             width: 16px;
             height: 16px;
             cursor: pointer;
             position: absolute;
         }
-        .download {
-            background-image: url("chrome://global/skin/icons/find.png");
-            background-position: 0px -32px;
-            left: 0px;
-        }
-        .download:hover {
-            background-position: 0px 0px;
-        }
-        .task[status='completed']:hover .download {
-            display: inline-block;
-        }
         .play {
             background-image: url("chrome://browser/skin/reload-stop-go.png");
             background-position: -27px 0px;
-            left: 16px;
+            left: 0px;
         }
         .play:hover {
             background-position: -27px -28px;

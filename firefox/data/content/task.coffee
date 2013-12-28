@@ -28,12 +28,11 @@ render_tasks = (tasks) ->
 		task_name = document.createElement 'span'
 		task_name.setAttribute 'class', 'task-name'
 		task_name.textContent = t.name
+		task_name.onclick = ->
+			task = page_tasks[@parentNode.getAttribute 'task-index']
+			if task.status_text == 'completed'
+				self.port.emit 'download', task
 		task.appendChild task_name
-		download = document.createElement 'div'
-		download.setAttribute 'class', 'download'
-		download.onclick = ->
-			self.port.emit 'download', page_tasks[@parentNode.getAttribute 'task-index']
-		task.appendChild download
 		play = document.createElement 'div'
 		play.setAttribute 'class', 'play'
 		play.onclick = ->
