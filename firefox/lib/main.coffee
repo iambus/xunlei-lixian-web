@@ -87,6 +87,16 @@ task_panel.port.on 'download', (task) ->
 			else
 				download_with result
 
+task_panel.port.on 'play', (task) ->
+	url = "http://vod.lixian.xunlei.com/share.html?from=lxweb&url=#{encodeURIComponent task.original_url}&filename=#{encodeURIComponent task.filename}&userid=#{client.get_id_from_cookie()}&gcid=#{task.gcid}&cid=#{task.cid}&isvip=1"
+
+	{Cc, Ci} = require("chrome")
+	io_service = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService)
+	referer = io_service.newURI('http://dynamic.cloud.vip.xunlei.com/user_task', null, null)
+
+	gBrowser = require('sdk/window/utils').getMostRecentBrowserWindow().gBrowser
+	gBrowser.selectedTab = gBrowser.addTab url, {referrerURI: referer}
+
 task_panel.port.on 'delete', (id) ->
 	client.delete_task_by_id id, (result) ->
 		if result.ok

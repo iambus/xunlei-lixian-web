@@ -34,6 +34,11 @@ render_tasks = (tasks) ->
 		download.onclick = ->
 			self.port.emit 'download', page_tasks[@parentNode.getAttribute 'task-index']
 		task.appendChild download
+		play = document.createElement 'div'
+		play.setAttribute 'class', 'play'
+		play.onclick = ->
+			self.port.emit 'play', page_tasks[@parentNode.getAttribute 'task-index']
+		task.appendChild play
 		remove = document.createElement 'div'
 		remove.setAttribute 'class', 'delete'
 		remove.onclick = ->

@@ -52,7 +52,7 @@
         #tasks .task:last-child {
             border-bottom: 1px dotted gray;
         }
-        .download, .delete {
+        .download, .play, .delete {
             display: none;
             width: 16px;
             height: 16px;
@@ -70,16 +70,27 @@
         .task[status='completed']:hover .download {
             display: inline-block;
         }
+        .play {
+            background-image: url("chrome://browser/skin/reload-stop-go.png");
+            background-position: -27px 0px;
+            left: 16px;
+        }
+        .play:hover {
+            background-position: -27px -28px;
+        }
+        .task:hover .play {
+            display: inline-block;
+        }
         .delete {
             background-image: url("chrome://browser/skin/reload-stop-go.png");
-            background-position: -16px 0px;
+            background-position: -14px 0px;
             right: 0px;
+        }
+        .delete:hover {
+            background-position: -14px -28px;
         }
         .task:hover .delete {
             display: inline-block;
-        }
-        .delete:hover {
-            background-position: -16px -28px;
         }
 
         #pages {
