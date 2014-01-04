@@ -18,6 +18,12 @@ login_panel = Panel
 	contentURL: self.data.url('content/login.html')
 	contentScriptFile: self.data.url('content/login.js')
 
+verification_code_panel = Panel
+	width: 200
+	height: 140
+	contentURL: self.data.url('content/verification_code.html')
+	contentScriptFile: self.data.url('content/verification_code.js')
+
 task_panel = Panel
 	width: 200
 	height: 220
@@ -48,6 +54,17 @@ require_login = ({username, password, verification_code}, callback) ->
 	login_panel.callback = callback
 	login_panel.port.emit 'login', username: username, password: password, save: save, verification_code: verification_code
 	login_panel.show()
+
+verification_code_panel.port.on 'verify', (verification_code) ->
+	callback = verification_code_panel.callback
+	verification_code_panel.callback = undefined
+	verification_code_panel.hide()
+	callback? verification_code
+
+require_verification_code = (callback) ->
+	verification_code_panel.callback = callback
+	verification_code_panel.port.emit 'verify'
+	verification_code_panel.show()
 
 widget_id = 'iambus-xunlei-lixian-web-firefox'
 
@@ -177,11 +194,12 @@ client = require('client').create()
 client.username = storage.username
 client.password = storage.password
 client.require_login = require_login
+client.require_verification_code = require_verification_code
 client.auto_relogin = true
 
 download_tools = require('download_tools')
 
-download_with = ({ok, tasks, finished, skipped, reason, response}) ->
+download_with = ({ok, tasks, finished, skipped, reason, detail, response}) ->
 	download_tool = download_tools.get() # TODO: check download tool before requests
 	if ok
 		finished = finished ? (t for t in tasks when t.status_text == 'completed')
@@ -197,7 +215,7 @@ download_with = ({ok, tasks, finished, skipped, reason, response}) ->
 			else
 				notify type: 'error', message: _('download_error_task_not_found')
 	else
-		notify type: 'error', message:  _('download_error', reason)
+		notify type: 'error', message:  _('download_error', if detail?.length < 80 then detail else reason)
 		console.log response
 
 download = (urls) ->

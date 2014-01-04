@@ -365,6 +365,10 @@ class XunleiClient
 			else
 				callback ok: false, reason: 'Failed be parse upload result', response: text
 
+	parse_jsonp_response: (response, jsonp) ->
+		code = response.match("^#{jsonp}\\((.+)\\)$")?[1]
+		if code?
+			return JSON.parse code
 
 	commit_bt_task: ({info_hash, name, size, files}, callback) ->
 		@with_id (id) =>
@@ -376,13 +380,23 @@ class XunleiClient
 				findex: (f['id']+'_' for f in files).join('')
 				size: (f['size']+'_' for f in files).join('')
 				from: '0'
-			jsonp = "jsonp#{current_timestamp()}"
-			commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
-			@post commit_url, form, ({text}) ->
-				if text.match "^#{jsonp}\(.*\)"
-					callback ok: true, reason: 'BT task created', info_hash: info_hash
-				else
-					callback ok: false, reason: 'Failed be parse bt result', response: text
+			try_commit = =>
+				jsonp = "jsonp#{current_timestamp()}"
+				commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
+				@post commit_url, form, ({text}) =>
+					result = @parse_jsonp_response text, jsonp
+					if result?.progress? and result.progress not in [-12, -11]
+						callback ok: true, reason: 'BT task created', info_hash: info_hash
+					else if result?.progress in [-12, -11]
+						if @require_verification_code
+							@require_verification_code (verification_code) ->
+								form.verify_code = verification_code
+								try_commit()
+						else
+							callback ok: false, reason: 'Verification code required', response: text
+					else
+						callback ok: false, reason: 'Failed be parse bt result', detail: "Failed be parse bt result: #{text}", response: text
+			try_commit()
 
 	add_bt_task_by_blob: (blob, callback) ->
 		@upload_torrent_file_by_blob blob, (result) =>
@@ -442,22 +456,32 @@ class XunleiClient
 			form["cid[#{i}]"] = ''
 			form["url[#{i}]"] = url
 		form['batch_old_taskid'] = '0' + ('' for [0...urls.length]).join(',')
-		jsonp = "jsonp#{current_timestamp()}"
-		url = "/interface/batch_task_commit?callback=#{jsonp}"
-#		@post url, form, callback
-		@auto_relogin_for
-			url: url
-			form: form
-			pattern: '''<script>document.cookie ="sessionid=; path=/; domain=xunlei.com"; document.cookie ="lx_sessionid=; path=/; domain=vip.xunlei.com";top.location='http://lixian.vip.xunlei.com/task.html?error=1'</script>'''
-			callback: (result) =>
-				if result.ok
-					text = result.text
-					if text.match "#{jsonp}\\(#{urls.length}\\)"
-						callback ok: true
+		try_add = =>
+			jsonp = "jsonp#{current_timestamp()}"
+			url = "/interface/batch_task_commit?callback=#{jsonp}"
+	#		@post url, form, callback
+			@auto_relogin_for
+				url: url
+				form: form
+				pattern: '''<script>document.cookie ="sessionid=; path=/; domain=xunlei.com"; document.cookie ="lx_sessionid=; path=/; domain=vip.xunlei.com";top.location='http://lixian.vip.xunlei.com/task.html?error=1'</script>'''
+				callback: (result) =>
+					if result.ok
+						text = result.text
+						code = @parse_jsonp_response text, jsonp
+						if code? and code not in [-12, -11]
+							callback ok: true
+						else if code in [-12, -11]
+							if @require_verification_code
+								@require_verification_code (verification_code) ->
+									form.verify_code = verification_code
+									try_add()
+							else
+								callback ok: false, reason: 'Verification code required', response: text
+						else
+							callback ok: false, reason: 'jsonp', detail: text, response: text
 					else
-						callback ok: false, reason: "jsonp", response: text
-				else
-					callback result
+						callback result
+		try_add()
 
 	########
 	# list #

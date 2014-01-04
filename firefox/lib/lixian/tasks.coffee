@@ -102,6 +102,7 @@ add_bt_tasks = (client, urls, callback) ->
 	add()
 
 super_add = (client, urls, callback) ->
+	logging 'adding'
 	normal_urls = (url for url in urls when url.match(/^(http|https|ftp|ed2k|thunder):/i))
 	bt_urls = (url for url in urls when url.match(/^(bt|magnet):|(^[0-9a-fA-F]{40}$)/i))
 	urls = []
