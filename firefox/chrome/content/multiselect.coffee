@@ -62,12 +62,12 @@ class TreeView
 			properties.push 'checked'
 		if hide_incomplete and task.status_text != 'completed'
 			properties.push 'hidden'
-		return properties.join ''
-	getCellProperties: (row ,column, props) ->
+		return properties.join ' '
+	getCellProperties: (row ,column) ->
 		task = @tasks[row]
 		if task.status_text != 'completed'
 			return 'disabled'
-	getColumnProperties: (colid, column, props) ->
+	getColumnProperties: (colid, column) ->
 	cycleHeader: (column) ->
 	isSorted: ->
 		return false

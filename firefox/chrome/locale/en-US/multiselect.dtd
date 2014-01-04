@@ -14,8 +14,8 @@
 
 <!ENTITY option.all.label "Select All">
 <!ENTITY option.all.tooltip "Select all files">
-<!ENTITY option.all.hide-incomplete "Hide Unfinished">
-<!ENTITY option.all.hide-incomplete "Hide unfinished files">
+<!ENTITY option.hide-incomplete.label "Hide Unfinished">
+<!ENTITY option.hide-incomplete.tooltip "Hide unfinished files">
 <!ENTITY option.hide-dir.label "Hide Folders">
 <!ENTITY option.hide-dir.tooltip "Hide folder names (but folders are still going to be created)">
 
