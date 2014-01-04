@@ -36,7 +36,7 @@ notify_in_status_bar = ({type, message, duration}) ->
 	notification_box = get_notification_box_in_status_bar()
 	old_id = notify_id
 	id = ++notify_id
-	icon = require("sdk/self").data.url('xunlei.ico')
+	icon = require("sdk/self").data.url('lixian.ico')
 	styles =
 		info: '#d4e6f7'
 		success: '#d4f7e6'

@@ -71,7 +71,7 @@ widget_id = 'iambus-xunlei-lixian-web-firefox'
 widget = Widget
 	id: widget_id
 	label: _('widget_label')
-	contentURL: self.data.url('xunlei.ico')
+	contentURL: self.data.url('lixian.ico')
 	contentScriptWhen: 'ready',
 	contentScriptFile: self.data.url('content/widget.js')
 	panel: task_panel
@@ -229,7 +229,7 @@ download_bt = (url) ->
 
 context_menu.Item
 	label: _('context_menu_download_link')
-	image: self.data.url('xunlei.ico')
+	image: self.data.url('lixian.ico')
 	context: context_menu.SelectorContext('a[href]')
 	contentScriptFile: self.data.url('content/menu/link.js')
 	onMessage: (url) ->
@@ -240,7 +240,7 @@ context_menu.Item
 
 context_menu.Item
 	label: _('context_menu_download_selection')
-	image: self.data.url('xunlei.ico')
+	image: self.data.url('lixian.ico')
 	context: context_menu.SelectionContext()
 	contentScriptFile: self.data.url('content/menu/text.js')
 	onMessage: (urls) ->
