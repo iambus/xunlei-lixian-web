@@ -84,7 +84,7 @@ task_panel.port.on 'refresh', (page_index) ->
 		if result.ok
 			task_panel.port.emit 'tasks', result
 		else
-			notify type: 'error', message:  _('list_error', result.reason)
+			notify type: 'error', message:  _('list_error', if result.detail?.length < 80 then result.detail else result.reason ? '')
 			console.log result.response
 
 task_panel.port.on 'resize', ({width, height}) ->
@@ -215,7 +215,7 @@ download_with = ({ok, tasks, finished, skipped, reason, detail, response}) ->
 			else
 				notify type: 'error', message: _('download_error_task_not_found')
 	else
-		notify type: 'error', message:  _('download_error', if detail?.length < 80 then detail else reason)
+		notify type: 'error', message:  _('download_error', if detail?.length < 80 then detail else reason ? '')
 		console.log response
 
 download = (urls) ->
