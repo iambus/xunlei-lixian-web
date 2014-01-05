@@ -164,6 +164,7 @@ expand_bt_tasks = (client, tasks, callback) ->
 super_search = (client, urls, callback) ->
 	search_tasks client, urls, (result) ->
 		if result.ok
+			# TODO: add not_found to expand_bt_tasks results
 			expand_bt_tasks client, result.tasks, callback
 		else
 			callback result
@@ -196,15 +197,16 @@ super_get_bt = (client, url, callback) ->
 		blob = new Blob [arraybuffer]
 		logging 'uploading_torrent'
 		client.upload_torrent_file_by_blob blob, (result) ->
+			upload_result = result
 			if result.ok
 				if result.done
 					super_search client, [result.info_hash], callback
 				else
 					super_search client, [result.info_hash], (result) ->
 						if result.ok
-							if result.tasks.length == 0 and result.skipped == 1
+							if result.tasks.length == 0
 								logging 'adding_bt'
-								client.commit_bt_task result, (result) ->
+								client.commit_bt_task upload_result, (result) ->
 									if result.ok
 										super_search client, [result.info_hash], callback
 									else
