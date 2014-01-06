@@ -120,7 +120,7 @@ task_panel.port.on 'delete', (id) ->
 			notify type: 'success', message:  _('delete_ok')
 			task_panel.port.emit 'refresh'
 		else
-			notify type: 'error', message:  _('delete_error', result.reason)
+			notify type: 'error', message:  _('delete_error', result.reason), detail: result.detail ? result.response
 			console.log result.response
 
 #widget.port.on 'left-click', ->
@@ -213,9 +213,9 @@ download_with = ({ok, tasks, finished, skipped, reason, detail, response}) ->
 			if tasks.length > 0
 				notify type: 'warning', message: _('download_error_task_not_ready')
 			else
-				notify type: 'error', message: _('download_error_task_not_found')
+				notify type: 'error', message: _('download_error_task_not_found'), detail: detail ? response
 	else
-		notify type: 'error', message:  _('download_error', if detail?.length < 80 then detail else reason ? '')
+		notify type: 'error', message:  _('download_error', if detail?.length < 80 then detail else reason ? ''), detail: detail ? response
 		console.log response
 
 download = (urls) ->

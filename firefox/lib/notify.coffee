@@ -32,7 +32,7 @@ get_notification_box_in_status_bar = ->
 	return notification_box
 
 notify_id = 0
-notify_in_status_bar = ({type, message, duration}) ->
+notify_in_status_bar = ({type, message, detail, duration}) ->
 	notification_box = get_notification_box_in_status_bar()
 	old_id = notify_id
 	id = ++notify_id
@@ -55,7 +55,13 @@ notify_in_status_bar = ({type, message, duration}) ->
 		success: 5
 		warning: 7
 		error: 10
-	e = notification_box.appendNotification message, id, icon, levels[type] ? levels.default, {}
+	buttons = []
+	if detail?
+		buttons.push
+			label: require('sdk/l10n').get('notification_copy_detail')
+			callback: ->
+				require("sdk/clipboard").set detail
+	e = notification_box.appendNotification message, id, icon, levels[type] ? levels.default, buttons
 	e.style.backgroundColor = styles[type] ? styles.info
 
 	clear_notification = (id) ->
