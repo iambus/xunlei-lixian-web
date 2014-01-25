@@ -198,7 +198,7 @@ class XunleiClient
 				callback
 					ok: false
 					reason: "Verification code required"
-					verification_code: no_cache "http://verify2.xunlei.com/image"
+					verification_code: no_cache "http://verify2.xunlei.com/image?t=MVA"
 
 	login_with_retry: (username, password, callback, retries=30) ->
 		@login_without_retry username, password, (result) =>
