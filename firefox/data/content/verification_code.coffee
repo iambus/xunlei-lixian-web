@@ -4,7 +4,7 @@ verification_image_element = document.getElementById 'verification_image'
 verification_code_element = document.getElementById 'verification_code'
 
 refresh = ->
-	verification_image_element.src = "http://verify2.xunlei.com/image?cachetime=#{new Date().getTime()}"
+	verification_image_element.src = "http://verify2.xunlei.com/image?t=MVA&cachetime=#{new Date().getTime()}"
 	verification_code_element.focus()
 	verification_code_element.select()
 

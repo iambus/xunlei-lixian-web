@@ -13,7 +13,7 @@ login_element.addEventListener 'click', ->
 	self.port.emit 'login', username: username_element.value, password: password_element.value, save: save_element.checked, verification_code: verification_code
 
 verification_image_element.addEventListener 'click', ->
-	verification_image_element.src = "http://verify2.xunlei.com/image?cachetime=#{new Date().getTime()}"
+	verification_image_element.src = "http://verify2.xunlei.com/image?t=MVA&cachetime=#{new Date().getTime()}"
 
 self.port.on 'login', ({username, password, save, verification_code}) ->
 	username_element.value = username ? ''

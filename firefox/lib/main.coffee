@@ -14,7 +14,7 @@ widget_menu = require 'widget_menu'
 
 login_panel = Panel
 	width: 200
-	height: 140
+	height: 180
 	contentURL: self.data.url('content/login.html')
 	contentScriptFile: self.data.url('content/login.js')
 
