@@ -10,6 +10,8 @@ notify = require("notify")
 {prefs} = require("sdk/simple-prefs")
 _ = require('sdk/l10n').get
 
+lixian_sites = require 'lixian/sites'
+
 widget_menu = require 'widget_menu'
 
 login_panel = Panel
@@ -222,6 +224,7 @@ download = (urls) ->
 	if Object.prototype.toString.call(urls) == '[object String]'
 		urls = [urls]
 	if urls?.length > 0
+		urls = lixian_sites.parse_all urls
 		client.super_get urls, download_with
 
 download_bt = (url) ->
@@ -246,7 +249,6 @@ context_menu.Item
 	onMessage: (urls) ->
 		download urls
 
-lixian_sites = require 'lixian/sites'
 context_menu.Item
 	label: _('context_menu_download_site')
 	image: self.data.url('lixian.ico')
