@@ -246,6 +246,17 @@ context_menu.Item
 	onMessage: (urls) ->
 		download urls
 
+lixian_sites = require 'lixian/sites'
+context_menu.Item
+	label: _('context_menu_download_site')
+	image: self.data.url('lixian.ico')
+	context: context_menu.URLContext(lixian_sites.urls)
+	contentScriptFile: self.data.url('content/menu/site.js')
+	onMessage: (url) ->
+		urls = lixian_sites.parse url
+		if urls?
+			download urls
+
 
 API =
 	download_url: (url) -> download [url]
