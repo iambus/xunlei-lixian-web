@@ -228,7 +228,7 @@ download = (urls) ->
 		client.super_get urls, download_with
 
 download_bt = (url) ->
-	client.super_get_bt url, download_with
+	client.super_get type: 'torrent_url', url: url, download_with
 
 context_menu.Item
 	label: _('context_menu_download_link')

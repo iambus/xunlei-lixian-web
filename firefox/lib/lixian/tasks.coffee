@@ -42,7 +42,7 @@ class CachedList
 
 search_tasks = (client, urls, callback) ->
 	if urls.length == 0
-		callback ok: true, tasks: []
+		callback ok: true, tasks: [], not_found: []
 		return
 	urls = urls.slice()
 	cached = new CachedList client
@@ -169,7 +169,7 @@ super_search = (client, urls, callback) ->
 		else
 			callback result
 
-super_get = (client, urls, callback) ->
+get_urls = (client, urls, callback) ->
 	search_tasks client, urls, (result) ->
 		if result.ok
 			if result.not_found.length > 0
@@ -189,7 +189,7 @@ super_get = (client, urls, callback) ->
 		else
 			callback result
 
-super_get_bt = (client, url, callback) ->
+get_torrent_url_resource = (client, url, callback) ->
 	logging 'downloading_torrent', url
 	require('http').get_binary url, ({arraybuffer}) ->
 		{Cu} = require 'chrome'
@@ -217,6 +217,63 @@ super_get_bt = (client, url, callback) ->
 							callback result
 			else
 				callback result
+
+merge_results = (results) ->
+	merge = (lists) ->
+		merged = []
+		seen = {}
+		for a in lists
+			if a?
+				for x in a
+					k = x.id ? x
+					if not seen[k]
+						seen[k] = true
+						merged.push x
+		merged
+	ok: true
+	tasks: merge (result.tasks for result in results)
+	not_found: merge (result.not_found for result in results)
+	finished: merge (result.finished for result in results)
+	skipped: merge (result.skipped for result in results)
+
+get_torrent_url_resources = (client, urls, callback) ->
+	urls = urls.slice()
+	results = []
+	get_next = ->
+		if urls.length > 0
+			url = urls.shift()
+			get_torrent_url_resource client, url, (result) =>
+				if result.ok
+					results.push result
+					get_next()
+				else
+					callback result
+		else
+			callback merge_results results
+	get_next()
+
+super_get = (client, urls, callback) ->
+	torrent_urls = []
+	normal_urls = []
+	for resource in urls
+		if Object.prototype.toString.call(resource) == '[object Object]'
+			if resource.type == 'torrent_url'
+				torrent_urls.push resource.url
+		else if Object.prototype.toString.call(resource) == '[object String]'
+			normal_urls.push resource
+
+	get_torrent_url_resources client, torrent_urls, (result1) ->
+		if result1.ok
+			get_urls client, normal_urls, (result2) ->
+				if result2.ok
+					callback merge_results [result1, result2]
+				else
+					callback result2
+		else
+			callback result1
+
+super_get_bt = (client, url, callback) ->
+	get_torrent_url_resource client, url, callback
 
 module.exports =
 	search_tasks: search_tasks
