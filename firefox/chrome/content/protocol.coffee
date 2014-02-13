@@ -1,5 +1,9 @@
 
 url = decodeURIComponent document.location.search.substr(1)
+try
+	# don't know why, just sometimes happens...
+	url = decodeURIComponent url
+catch e
 
 Ci = Components.interfaces
 
