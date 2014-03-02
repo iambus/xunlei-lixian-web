@@ -1,8 +1,9 @@
 
 torrentz = require 'lixian/sites/torrentz'
 nyaa = require 'lixian/sites/nyaa'
+attachment = require 'lixian/sites/attachment'
 
-sites = [torrentz, nyaa]
+sites = [torrentz, nyaa, attachment]
 
 urls = (site.pattern for site in sites)
 
