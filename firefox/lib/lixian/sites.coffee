@@ -10,7 +10,7 @@ urls = (site.pattern for site in sites)
 check = (url) ->
 	for site in sites
 		if site.pattern.test url
-			true
+			return true
 	return false
 
 parse = (url) ->
