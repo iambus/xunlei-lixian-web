@@ -363,7 +363,7 @@ class XunleiClient
 					done: true
 					info_hash: result['infoid']
 			else
-				callback ok: false, reason: 'Failed be parse upload result', response: text
+				callback ok: false, reason: 'Failed to parse upload result', response: text
 
 	parse_jsonp_response: (response, jsonp) ->
 		code = response.match("^#{jsonp}\\((.+)\\)$")?[1]
@@ -395,7 +395,7 @@ class XunleiClient
 						else
 							callback ok: false, reason: 'Verification code required', response: text
 					else
-						callback ok: false, reason: 'Failed be parse bt result', detail: "Failed be parse bt result: #{text}", response: text
+						callback ok: false, reason: 'Failed to parse bt result', detail: "Failed to parse bt result: #{text}", response: text
 			try_commit()
 
 	add_bt_task_by_blob: (blob, callback) ->
