@@ -165,7 +165,7 @@ class XunleiClient
 	#########
 
 	is_session_timed_out_response: (text) ->
-		text == '''<script>document.cookie ="sessionid=; path=/; domain=xunlei.com"; document.cookie ="lx_sessionid=; path=/; domain=vip.xunlei.com";top.location='http://lixian.vip.xunlei.com/task.html?error=1'</script>'''
+		text == '''<script>document.cookie ="sessionid=; path=/; domain=xunlei.com"; document.cookie ="lx_sessionid=; path=/; domain=jiayuan.xunlei.com";top.location='http://lixian.vip.xunlei.com/task.html?error=1'</script>'''
 
 	get_id_from_cookie: ->
 		@get_cookie('xunlei.com', 'userid')
