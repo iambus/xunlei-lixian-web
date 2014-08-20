@@ -150,7 +150,15 @@ class XunleiClient
 		url = @url url
 		@login_check =>
 			# TODO: check response for session timeout
-			@http_upload url, form, callback
+			@http_upload url, form, (result) =>
+				if @auto_relogin and @is_session_timed_out_response result.text
+					@auto_login (result) =>
+						if result.ok
+							@http_upload url, form, callback
+						else
+							callback result
+				else
+					callback result
 
 	init: (callback) ->
 		if @initialized
