@@ -393,7 +393,9 @@ class XunleiClient
 				commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
 				@post commit_url, form, ({text}) =>
 					result = @parse_jsonp_response text, jsonp
-					if result?.progress? and result.progress not in [-12, -11]
+					if result?.msg # "progress":2,"rtcode":"75","msg":"..."
+						callback ok: false, reason: result.msg, response: text
+					else if result?.progress? and result.progress not in [-12, -11]
 						callback ok: true, reason: 'BT task created', info_hash: info_hash
 					else if result?.progress in [-12, -11]
 						if @require_verification_code
