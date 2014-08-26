@@ -11,6 +11,7 @@ XunleiClient.prototype.get_domain_cookie = require('cookie').get
 XunleiClient.prototype.set_domain_cookie = require('cookie').set
 
 utils.md5 = require('md5')
+utils.base64 = require('base64')
 
 utils.setTimeout = require('sdk/timers').setTimeout
 

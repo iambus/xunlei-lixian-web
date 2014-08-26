@@ -14,7 +14,6 @@ encypt_password = (password) ->
 current_timestamp = ->
 	new Date().getTime()
 
-
 no_cache = (url) ->
 	if url.indexOf('?') == -1
 		url += '?'
@@ -22,6 +21,25 @@ no_cache = (url) ->
 		url += '&'
 	url += 'nocache=' + current_timestamp()
 
+is_dirty_resource = ->
+
+encode_dirty_name = (x) ->
+	prefix = '[base64]'
+	try
+		prefix + utils.base64.encode(x)
+	catch
+		x
+
+decode_dirty_name = (x) ->
+	prefix = '[base64]'
+	n = prefix.length
+	if x.substring(0, n) == prefix
+		try
+			utils.base64.decode(x.substring(n))
+		catch
+			x
+	else
+		x
 
 ################################################################################
 # utils
@@ -31,6 +49,11 @@ utils =
 	encypt_password: encypt_password
 	md5: ->
 		throw new Error("Not Implemented: md5")
+	base64:
+		encode: ->
+			throw new Error("Not Implemented: base64.encode")
+		decode: ->
+			throw new Error("Not Implemented: base64.decode")
 	setTimeout: this.setTimeout
 
 ################################################################################
@@ -51,7 +74,7 @@ class Task
 		for k, v of json
 			@[k] = v
 		@type = @protocol = @url.match('^[^:]+')[0].toLowerCase()
-		@name = unescape(@taskname).replace /(&amp;)+/g, '&'
+		@name = decode_dirty_name unescape(@taskname).replace /(&amp;)+/g, '&'
 		@filename = @name
 		@full_path = @filename
 		@original_url = @url
@@ -388,13 +411,19 @@ class XunleiClient
 				findex: (f['id']+'_' for f in files).join('')
 				size: (f['size']+'_' for f in files).join('')
 				from: '0'
+			fixed_dirty = false
 			try_commit = =>
 				jsonp = "jsonp#{current_timestamp()}"
 				commit_url = "/interface/bt_task_commit?callback=#{jsonp}"
 				@post commit_url, form, ({text}) =>
 					result = @parse_jsonp_response text, jsonp
 					if result?.msg # "progress":2,"rtcode":"75","msg":"..."
-						callback ok: false, reason: result.msg, response: text
+						if fixed_dirty
+							callback ok: false, reason: result.msg, response: text
+						else
+							fixed_dirty = true
+							form.btname = encode_dirty_name form.btname
+							try_commit()
 					else if result?.progress? and result.progress not in [-12, -11]
 						callback ok: true, reason: 'BT task created', info_hash: info_hash
 					else if result?.progress in [-12, -11]
